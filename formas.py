@@ -56,6 +56,12 @@ class ControlaFormas:
         self.formas = []
         self.relogio = 0
         self.intervalo = 60
+        
+        self.contador_cortes = {
+            "Círculo": 0,
+            "Quadrado": 0,
+            "Triângulo": 0
+        }
 
     def gerar_formas(self):
         if len(self.formas) >= self.limite_max_formas:
