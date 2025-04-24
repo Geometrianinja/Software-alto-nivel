@@ -1,5 +1,5 @@
 import pygame
-
+import config
 import fases
 import Estados.menu as menu
 import Estados.menu_config as menu_config
@@ -14,15 +14,25 @@ class Gerenciador:
     """
     def __init__(self):
         self.estados = {
+
             "CONTROL": menu_config.ConfigControle(),
-            "FASE00" : fases.Fase00(),
+            "FASE00" : fases.Fase00(config.LARGURA, config.ALTURA),
             "MENU"   : menu.Menu_principal(), 
             "CONFIG" : menu_config.Configuracao(),
             "FASES"  : menu.Fases(),
-            "FASE01" : fases.Fase01()
-        }
-        self.estado_atual = self.estados["MENU"]
+            "FASE01" : fases.Fase01(config.LARGURA, config.ALTURA),
+            "FASE02" : fases.Fase02(config.LARGURA, config.ALTURA),
+
+
+            }
         
+        self.estado_atual = self.estados["MENU"]  # Estado inicial
+
+    def esta_em_fase(self):
+        
+        return hasattr(self.estado_atual, 'impactar_forma') 
+    
+   
     def mudar_estado(self, novo_estado):
         self.estado_atual = self.estados[novo_estado]
         
@@ -30,11 +40,15 @@ class Gerenciador:
         estado = self.estado_atual.processar_input(pygame.mouse.get_pos())
         if(estado != self.estado_atual):
             self.mudar_estado(estado)
-        
+    
+    
     def atualizar(self):
         self.estado_atual.atualizar()
     
     def desenhar(self, tela):
         self.estado_atual.desenhar(tela)
+        if hasattr(self.estado_atual, 'desenhar_titulo'):
+            self.estado_atual.desenhar_titulo(tela)
+    
     
     

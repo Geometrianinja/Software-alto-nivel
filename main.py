@@ -19,7 +19,12 @@ class Jogo:
                 if evento.type == pygame.QUIT:
                     self.jogando = False
                 elif evento.type == pygame.MOUSEBUTTONDOWN:
-                    self.manager.seleciona_estado()
+                    if self.manager.esta_em_fase():
+                        pos = pygame.mouse.get_pos()
+                        self.manager.estado_atual.processar_input(pos)
+                    else:
+                        self.manager.seleciona_estado()
+
 
             self.manager.atualizar()
             self.manager.desenhar(self.tela)
