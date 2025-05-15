@@ -30,7 +30,7 @@ class Gerenciador:
 
     def esta_em_fase(self):
         
-        return hasattr(self.estado_atual, 'impactar_forma') 
+        return hasattr(self.estado_atual, 'impactar_forma') # detecta se estado atual é uma fase
     
    
     def mudar_estado(self, novo_estado):
@@ -42,13 +42,12 @@ class Gerenciador:
             self.mudar_estado(estado)
     
     
-    def atualizar(self):
-        self.estado_atual.atualizar()
+    def atualizar(self, input_manager):
+        self.estado_atual = self.estados[self.estado_atual.atualizar(input_manager)]
     
     def desenhar(self, tela):
         self.estado_atual.desenhar(tela)
-        if hasattr(self.estado_atual, 'desenhar_titulo'):
-            self.estado_atual.desenhar_titulo(tela)
+        
     
     
     
