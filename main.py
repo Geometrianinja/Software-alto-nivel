@@ -14,7 +14,6 @@ import win32api
 
 from entrada import InputManager
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Eletronica import receiver
 
 
