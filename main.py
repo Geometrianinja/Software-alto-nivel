@@ -33,7 +33,8 @@ class Jogo:
         while self.jogando:
             self.input_manager.update()
             
-            self.manager.atualizar(self.input_manager)
+            if self.manager.atualizar(self.input_manager):
+                self.jogando = False
             self.manager.desenhar(self.tela)
 
             pygame.display.flip()
