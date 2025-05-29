@@ -5,11 +5,6 @@ import threading
 class InputManager(Calibrattion):
     def __init__(self):
         self.controller = Controller()
-        """while(not self.controller.connect()):
-            print("Trying to connect...")
-            time.sleep(0.5)
-        controller_thread = threading.Thread(target=self.controller.run)
-        controller_thread.start()"""
 
         super().__init__()
 
@@ -26,6 +21,9 @@ class InputManager(Calibrattion):
         self.mouse_left_just_pressed = False
         self.mouse_right_just_pressed = False
         self.mouse_pos = [0, 0]
+        
+        self.Key_enter_pressed = False
+        self.using_controller = False
 
     def update(self):
         self.cont_back_just_pressed = False
@@ -57,10 +55,15 @@ class InputManager(Calibrattion):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit_just_pressed = True
+                elif event.key == pygame.K_RETURN:
+                    self.Key_enter_pressed = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_RETURN:
+                    self.Key_enter_pressed = False
             
             
-        """
-        while True:
+        
+        while self.using_controller:
             event = self.controller.get_event()
 
             if isinstance(event, GyroEvent):
@@ -73,9 +76,13 @@ class InputManager(Calibrattion):
                 elif event.button == ButtonID.BUTTON_SELECT and event.event_type == ButtonEventType.PRESSED:
                     self.cont_select_pressed = True
                     self.cont_select_just_pressed = True
+                    self.button_select_and_pressed = True
+                else: 
+                    self.button_select_and_pressed = False
+
 
             if self.controller.get_queue_size() < 5:
-                break"""
+                break
         
         if self.calibrated:
             self.cont_screen_pos = self.get_point(self.gyro)

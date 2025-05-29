@@ -19,6 +19,11 @@ class MenuBase():
         self.gera_imagens()
         
     def gera_imagens(self):
+        """Gera os objetos que aparecem na tela.
+        
+        Cria as superfícies e retangulos para mostrar na tela
+        """
+        
         if self.background_path:
             self.surf["Background"] = pygame.image.load(self.background_path).convert_alpha()
             self.rect["Background"] = self.surf["Background"].get_rect(center=(config.LARGURA / 2, config.ALTURA / 2))
@@ -36,6 +41,16 @@ class MenuBase():
                 self.rect[nome] = self.surf[nome].get_rect(topleft=(config.LARGURA // 2 - 100, 150 + i * 60))
 
     def atualizar(self, input_manager):
+        """Atualiza o estado atual do jogo.
+        
+        Realiza a verificação se algum botão de mudança de estado foi precionado.
+        
+        Args:
+            input_manager: Variavel responsável por armazenar as entradas do jogador, como a posição do mouse.
+            
+        Returns:
+            String: Se o jogador deseja mudar de estado, ele retorna o futuro estado, caso contrário, ele retorna o próprio estado
+        """
         for (nome, estado) in self.opcoes:
             if input_manager.mouse_left_just_pressed and self.rect[nome].collidepoint(input_manager.mouse_pos):
                 return estado
@@ -43,6 +58,11 @@ class MenuBase():
         return self.estado_name
     
     def desenhar(self, tela):
+        """Desenha os objetos na tela.
+        
+        Args:
+            tela (pygame.Surface): Superfície onde o estado será desenhado.
+        """
         if "Background" in self.surf:
             tela.blit(self.surf["Background"], self.rect["Background"])
         else:

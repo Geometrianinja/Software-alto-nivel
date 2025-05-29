@@ -13,13 +13,13 @@ class Forma(ABC):
         self.altura = int(altura)
         self.cor = cor  
         self.raio = 50
-
-        self.x_inicial = random.randint(100, self.largura - 100)
-        self.y = self.altura
+        
+        self.x_inicial = x_inicial if x_inicial is not None else random.randint(100, self.largura - 100)
+        self.y = y if y is not None else self.altura
         self.amplitude_y = self.altura - 100
         self.amplitude_x = 20
         self.tempo = tempo
-        self.velocidade = random.uniform(0.0125, 0.025)
+        self.velocidade = velocidade if velocidade is not None else random.uniform(0.0125, 0.025)
 
         self.impactada = False
         self.tempo_impacto = 0
@@ -30,8 +30,10 @@ class Forma(ABC):
     #@abstractmethod
     def atualizar(self):
         self.tempo += 1
-        self.y = self.altura + (self.amplitude_y * math.sin(self.velocidade * self.tempo + 1.5))
-        self.x = self.x_inicial + (self.amplitude_x * math.cos(0.01 * self.tempo))
+        if self.velocidade != 0:    
+            self.y = self.altura + (self.amplitude_y * math.sin(self.velocidade * self.tempo + 1.5)) 
+            
+        self.x = self.x_inicial + (self.amplitude_x * math.cos(0.01 * self.tempo)) * self.velocidade
         
         self.rect.center = (self.x, self.y) #Adicionado por Artur
         

@@ -31,7 +31,7 @@ class Gerenciador:
 
             }
         
-        self.estado_atual = self.estados["MENU"]  # Estado inicial
+        self.estado_atual = self.estados["CONTROL"]  # Estado inicial
 
     def esta_em_fase(self):
         """Verifica se o estado atual é uma fase jogável.
@@ -56,6 +56,8 @@ class Gerenciador:
             bool: Retorna True se o jogador deseja sair do jogo, caso contrário, retorna False.
         """
         if(input_manager.quit_just_pressed):
+            if(input_manager.using_controller):
+                input_manager.controller.stop()
             return True
         
         estado_informado = self.estado_atual.atualizar(input_manager)
@@ -72,6 +74,3 @@ class Gerenciador:
         """
         self.estado_atual.desenhar(tela)
         
-    
-    
-    

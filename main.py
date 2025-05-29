@@ -13,12 +13,11 @@ import sys
 import win32api
 
 from entrada import InputManager
-
 from Eletronica import receiver
 
 
 class Jogo:
-    def __init__(self, controller):
+    def __init__(self):
         pygame.init()
         self.tela = pygame.display.set_mode((config.LARGURA, config.ALTURA))
         pygame.display.set_caption("Shaolin Shapes")
@@ -26,8 +25,6 @@ class Jogo:
         self.jogando = True
         self.manager = GSM.Gerenciador()
         self.input_manager = InputManager()
-        self.controller = controller
-        
 
     def rodar(self):
         while self.jogando:
@@ -43,15 +40,7 @@ class Jogo:
         pygame.quit()
 
 def main():
-    controller = receiver.Controller()
-    """while(not controller.connect()):
-        print("Trying to connect...")
-        time.sleep(0.5)
-        pass
-    ble_thread = threading.Thread(target=controller.run)
-    ble_thread.start()"""
-    Jogo(controller).rodar()
-    #controller.stop()
+    Jogo().rodar()
 
 if __name__ == "__main__":
     main()
