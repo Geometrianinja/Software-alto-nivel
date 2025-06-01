@@ -25,6 +25,8 @@ class InputManager(Calibrattion):
         self.Key_enter_pressed = False
         self.using_controller = False
 
+        self.gyro = (0, 0, 0)
+
     def update(self):
         self.cont_back_just_pressed = False
         self.cont_select_just_pressed = False

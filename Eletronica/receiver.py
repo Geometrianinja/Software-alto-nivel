@@ -116,10 +116,11 @@ class Controller():
                 
                 if data == 'B':
                     event = ButtonEvent(ButtonID.BUTTON_BACK, ButtonEventType.PRESSED)
+                    print('back')
                 elif data == 'b':
                     event = ButtonEvent(ButtonID.BUTTON_BACK, ButtonEventType.RELEASED)
                 elif data == 'S':
-                    print('setect')
+                    print('select')
                     event = ButtonEvent(ButtonID.BUTTON_SELECT, ButtonEventType.PRESSED)
                 elif data == 's':
                     event = ButtonEvent(ButtonID.BUTTON_SELECT, ButtonEventType.RELEASED)

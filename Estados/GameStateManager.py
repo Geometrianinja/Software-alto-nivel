@@ -64,7 +64,7 @@ class Gerenciador:
         self.estado_atual = self.estados[estado_informado]
         return False
     
-    def desenhar(self, tela):
+    def desenhar(self, tela, input_manager=None):
         """Desenha o estado atual na tela.
         
         Chama o método de renderização do estado atual.
@@ -72,5 +72,14 @@ class Gerenciador:
         Args:
             tela (pygame.Surface): Superfície onde o estado será desenhado.
         """
-        self.estado_atual.desenhar(tela)
+        if input_manager and input_manager.cont_screen_pos:
+            pygame.draw.circle(
+                tela,
+                (255, 0, 0),
+                input_manager.cont_screen_pos,
+                10
+            )
+
+
+        self.estado_atual.desenhar(tela, input_manager)
         

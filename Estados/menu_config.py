@@ -76,12 +76,12 @@ class ConfigControle():
         self.opcoes.append(["Mensagem3", "Mensagem3"])
         
         self.target1 = formas.Circulo(config.LARGURA, config.ALTURA, self.color,
-                                       x_inicial=config.LARGURA - 100, y=config.ALTURA - 100, velocidade=0)
+                                       x_inicial = config.LARGURA - 100, y = config.ALTURA - 100, velocidade = 0)
         self.surf["Circle01"] = self.target1
         self.opcoes.append(["Circle01", "Circle01"])
         
         self.target2 = formas.Circulo(config.LARGURA, config.ALTURA, self.color,
-                                       x_inicial=100, y=100, velocidade=0)
+                                       x_inicial = 100, y = 100, velocidade = 0)
         self.surf["Circle02"] = self.target2
         self.opcoes.append(["Circle02", "Circle02"])
         
@@ -135,10 +135,10 @@ class ConfigControle():
         elif input_manager.cont_select_just_pressed:
             if len(self.calib_pairs) == 0:
                 self.calib_pairs.append((input_manager.gyro[0], input_manager.gyro[1]))
-                self.calib_pairs.append((self.target1.x, self.target1.y))
+                self.calib_pairs.append((self.target2.x, self.target2.y))
             else:
                 self.calib_pairs.append((input_manager.gyro[0], input_manager.gyro[1]))
-                self.calib_pairs.append((self.target2.x, self.target2.y))
+                self.calib_pairs.append((self.target1.x, self.target1.y))
                 print(self.calib_pairs)
                 input_manager.set_calibration_data(self.calib_pairs[0], self.calib_pairs[1], 
                                                    self.calib_pairs[2], self.calib_pairs[3])
@@ -146,7 +146,7 @@ class ConfigControle():
         return self.estado_name
                     
     
-    def desenhar(self, tela):
+    def desenhar(self, tela, input_manager=None):
         """Renderiza os elementos visuais na tela.
     
         Exibe os elementos gráficos, como plano de fundo, textos e alvos de calibração.
@@ -156,9 +156,13 @@ class ConfigControle():
             tela: Superfície onde os elementos serão desenhados (geralmente a tela principal do jogo).
         """
         for (nome, estado) in self.opcoes:
-            objeto = self.surf[nome]
-            if (len(self.calib_pairs) != 0 and nome == "Circle02"):
+            # Antes da primeira calibração, só mostra o círculo de cima
+            if len(self.calib_pairs) == 0 and nome == "Circle01":
                 continue
+            # Depois da primeira calibração, só mostra o círculo de baixo
+            if len(self.calib_pairs) != 0 and nome == "Circle02":
+                continue
+            objeto = self.surf[nome]
             if isinstance(objeto, formas.Forma):
                 objeto.atualizar()
                 objeto.desenhar(tela)

@@ -57,7 +57,7 @@ class MenuBase():
         
         return self.estado_name
     
-    def desenhar(self, tela):
+    def desenhar(self, tela, input_manager=None):
         """Desenha os objetos na tela.
         
         Args:
@@ -70,6 +70,15 @@ class MenuBase():
 
         for (nome, estado) in self.opcoes:
             tela.blit(self.surf[nome], self.rect[nome])
+
+        if input_manager and input_manager.cont_screen_pos:
+            """print(f"Controller position: {input_manager.cont_screen_pos}")"""
+            pygame.draw.circle(
+                tela,
+                (255, 0, 0),
+                input_manager.cont_screen_pos,
+                10
+            )
         
     
 class MenuPrincipal(MenuBase):

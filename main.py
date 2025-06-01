@@ -32,7 +32,7 @@ class Jogo:
             
             if self.manager.atualizar(self.input_manager):
                 self.jogando = False
-            self.manager.desenhar(self.tela)
+            self.manager.desenhar(self.tela, self.input_manager)
 
             pygame.display.flip()
             self.clock.tick(config.FPS)
