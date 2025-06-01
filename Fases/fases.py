@@ -49,14 +49,29 @@ class FaseBase(ABC):
         self.agendar_geracao_inicial()
 
     def atualizar(self, input_manager):
+        # Mouse: impacta forma se clicar com o mouse
+
+        if input_manager.cont_back_just_pressed:
+            return "FASES"
+        
         for forma in self.formas:
             if (not forma.impactada) and input_manager.mouse_left_pressed and forma.foi_clicado(input_manager.mouse_pos):
                 forma.impactada = True
                 self.contador_cortes[forma.tipo] += 1
                 if len(self.formas) + len(self.fila_formas) < self.limite_max_formas:
-                     self.gerar_com_delay(forma.tipo)
+                    self.gerar_com_delay(forma.tipo)
             forma.atualizar()
-    
+
+        # Controle: impacta forma se apertar o botão de seleção apontando para ela
+        if input_manager.cont_select_just_pressed and input_manager.cont_screen_pos:
+            for forma in self.formas:
+                if (not forma.impactada) and forma.foi_clicado(input_manager.cont_screen_pos):
+                    forma.impactada = True
+                    self.contador_cortes[forma.tipo] += 1
+                    if len(self.formas) + len(self.fila_formas) < self.limite_max_formas:
+                        self.gerar_com_delay(forma.tipo)
+                    break  # Só impacta uma forma por clique
+
         self.contador_delay += 1
         if self.fila_formas and self.contador_delay >= self.delay_frames:
             if len(self.formas) < self.limite_max_formas:
@@ -117,7 +132,7 @@ class FaseBase(ABC):
                 self.rect[nome] = self.surf[nome].get_rect(topleft=(config.LARGURA // 2 - 100, 150 + i * 60))"""
 
     
-    def desenhar(self, tela):
+    def desenhar(self, tela, input_manager=None):
         if "Background" in self.surf:
             tela.blit(self.surf["Background"], self.rect["Background"])
         else:
@@ -128,6 +143,16 @@ class FaseBase(ABC):
             
         self.desenhar_titulo(tela)
         self.desenhar_contador(tela)
+
+        if input_manager and input_manager.cont_screen_pos:
+            """print(f"Controller position: {input_manager.cont_screen_pos}")"""
+            pygame.draw.circle(
+                tela,
+                (255, 0, 0),
+                input_manager.cont_screen_pos,
+                10
+            )
+        
         
     def desenhar_titulo(self, tela):
             
