@@ -20,14 +20,23 @@ class InputManager(Calibrattion):
         self.mouse_right_pressed = False
         self.mouse_left_just_pressed = False
         self.mouse_right_just_pressed = False
-        self.mouse_pos = [0, 0]
-        
+        self.mouse_pos: list[float] = [0, 0]
+        self.mouse_diff: list[float] = [0, 0]
+
         self.Key_enter_pressed = False
         self.using_controller = False
 
         self.gyro = (0, 0, 0)
 
+        self.last_time: float = 0.0
+        self.dt: float = 0.0
+        self.time: float = 0.0
+
     def update(self):
+        self.time = time.time()
+        self.dt = self.time - self.last_time  # Time elapsed since last frame in seconds
+        self.last_time = self.time
+
         self.cont_back_just_pressed = False
         self.cont_select_just_pressed = False
 
@@ -53,6 +62,7 @@ class InputManager(Calibrattion):
                     
             elif event.type == pygame.MOUSEMOTION:
                 self.mouse_pos = event.pos
+                self.mouse_diff = [event.rel[0], event.rel[1]]
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:

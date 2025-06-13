@@ -16,7 +16,7 @@ class ConfigControle():
     Esta classe é responsável por gerenciar a configuração inicial do controle,
     onde o jogador configura a origem, vel...
     """
-    def __init__(self):
+    def __init__(self, input_manager):
         """Inicializa o menu de configuração do controle.
     
         Define os estados iniciais da tela, como plano de fundo, mensagens,
@@ -37,6 +37,8 @@ class ConfigControle():
         self.calibrated = False
         self.font = pygame.font.Font("PressStart2P.ttf", 24)
         self.gera_imagens()
+
+        self.input_manager = input_manager
         
     def gera_imagens(self):
         """Gera e posiciona os elementos visuais iniciais da tela.
@@ -86,29 +88,26 @@ class ConfigControle():
         self.opcoes.append(["Circle02", "Circle02"])
         
         
-    def try_connect(self, input_manager):
+    def try_connect(self):
         """Tenta estabelecer a conexão com o controle.
     
         Tenta conectar-se ao controle, e verifica se o jogador deseja utilizar o mouse.
         Se a conexão for bem-sucedida, inicia uma nova thread para o controle e
         altera o estado visual da tela. Alternativamente, permite o uso do mouse
         caso o jogador pressione ENTER.
-    
-        Args:
-            input_manager: Objeto que armazena as entradas do jogador, como botão ENTER ou conexão Bluetooth.
-    
+
         Returns:
             str: Nome do estado atual do jogo, que pode continuar sendo "CONTROL" ou passar para o próximo.
         """
         if not self.connected:
-            if input_manager.controller.connect(): #Tentativa de se conectar com o controle
-                controller_thread = threading.Thread(target=input_manager.controller.run)
+            if self.input_manager.controller.connect(): #Tentativa de se conectar com o controle
+                controller_thread = threading.Thread(target=self.input_manager.controller.run)
                 controller_thread.start()
-                input_manager.using_controller = True   #Isso aqui é para ele entrar no while do update
+                self.input_manager.using_controller = True   #Isso aqui é para ele entrar no while do update
                 self.connected = True
                 self.new_image()    #Isso aqui é para gerar a tela com os dois circulos :D
                 return self.estado_name
-            elif(input_manager.Key_enter_pressed):
+            elif(self.input_manager.Key_enter_pressed):
                 self.connected = True
                 #self.new_image()           #Temporario para poder testar com o mouse as coisas
                 #return self.estado_name
@@ -117,30 +116,28 @@ class ConfigControle():
             time.sleep(0.05)
             return self.estado_name
         
-    def atualizar(self, input_manager):
+    def atualizar(self):
         """Atualiza o estado da configuração do controle.
 
         Processa a tentativa de conexão ou o processo de calibração baseado
         nas entradas do jogador. Ao completar a calibração, altera o estado do jogo.
-        Args:
-            input_manager: Objeto que gerencia as entradas do jogador, como giroscópio e botões.
     
         Returns:
             str: Nome do próximo estado do jogo. Pode ser o próprio estado ou o "MENU".
         """
         if(not self.connected):
-            return self.try_connect(input_manager)
+            return self.try_connect()
         elif self.calibrated:
             return self.next_state
-        elif input_manager.cont_select_just_pressed:
+        elif self.input_manager.cont_select_just_pressed:
             if len(self.calib_pairs) == 0:
-                self.calib_pairs.append((input_manager.gyro[0], input_manager.gyro[1]))
+                self.calib_pairs.append((self.input_manager.gyro[0], self.input_manager.gyro[1]))
                 self.calib_pairs.append((self.target2.x, self.target2.y))
             else:
-                self.calib_pairs.append((input_manager.gyro[0], input_manager.gyro[1]))
+                self.calib_pairs.append((self.input_manager.gyro[0], self.input_manager.gyro[1]))
                 self.calib_pairs.append((self.target1.x, self.target1.y))
                 print(self.calib_pairs)
-                input_manager.set_calibration_data(self.calib_pairs[0], self.calib_pairs[1], 
+                self.input_manager.set_calibration_data(self.calib_pairs[0], self.calib_pairs[1], 
                                                    self.calib_pairs[2], self.calib_pairs[3])
                 self.calibrated = True
         return self.estado_name
@@ -164,7 +161,7 @@ class ConfigControle():
                 continue
             objeto = self.surf[nome]
             if isinstance(objeto, formas.Forma):
-                objeto.atualizar()
+                objeto.atualizar(self.input_manager.dt)
                 objeto.desenhar(tela)
             else:
                 tela.blit(self.surf[nome], self.rect[nome])

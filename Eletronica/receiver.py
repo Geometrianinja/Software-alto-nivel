@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
 import asyncio
-from bleak import BleakClient, BleakScanner
 import struct
 import pygame
 import threading

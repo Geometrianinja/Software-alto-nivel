@@ -6,10 +6,11 @@ import config
 import Fases.fases_antigo as fases_antigo
 
 class MenuBase():
-    def __init__(self, estado_name, opcoes, background_path = None, botoes_posicoes = None, botao_largura = 200, botao_altura = 80):
+    def __init__(self, estado_name, opcoes, input_manager, background_path = None, botoes_posicoes = None, botao_largura = 200, botao_altura = 80):
         self.estado_name = estado_name
         self.opcoes = opcoes
-        
+        self.input_manager = input_manager
+
         self.surf = {}
         self.rect = {}
         
@@ -51,14 +52,11 @@ class MenuBase():
             self.rect[nome] = self.surf[nome].get_rect(center=(x, y))
 
 
-    def atualizar(self, input_manager):
+    def atualizar(self):
         """Atualiza o estado atual do jogo.
         
         Realiza a verificação se algum botão de mudança de estado foi precionado.
         
-        Args:
-            input_manager: Variavel responsável por armazenar as entradas do jogador, como a posição do mouse.
-            
         Returns:
             String: Se o jogador deseja mudar de estado, ele retorna o futuro estado, caso contrário, ele retorna o próprio estado
         """
@@ -66,7 +64,7 @@ class MenuBase():
         
         
         for (nome, estado) in self.opcoes:
-            if input_manager.mouse_left_just_pressed and self.rect[nome].collidepoint(input_manager.mouse_pos):
+            if self.input_manager.mouse_left_just_pressed and self.rect[nome].collidepoint(self.input_manager.mouse_pos):
                 return estado
         
         return self.estado_name
@@ -90,14 +88,14 @@ class MenuPrincipal(MenuBase):
     Exibe as opções iniciais como 'Jogar' e 'Configuração', e lida com a entrada
     do jogador para selecionar uma dessas opções.
     """
-    def __init__(self):
+    def __init__(self, input_manager):
         opcoes = [["Jogar", "FASES"], ["Configuracao", "CONFIG"]]
         botoes_posicoes = [
             (config.LARGURA / 2, config.ALTURA / 2 - 50),
             (config.LARGURA / 2, config.ALTURA / 2 + 50),
         ]
         background = join('images', 'FlorestaInicio.png')
-        super().__init__("MENU", opcoes, background, botoes_posicoes=botoes_posicoes, botao_largura=200, botao_altura=80)
+        super().__init__("MENU", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=200, botao_altura=80)
                 
 
 class Fases(MenuBase):
@@ -106,7 +104,7 @@ class Fases(MenuBase):
     
     Menu responsável por informar quais fases o jogador por escolher.
     """
-    def __init__(self):
+    def __init__(self, input_manager):
         opcoes = [
             ["Fase 0", "INTRO0"],
             ["Fase 1", "INTRO1"],
@@ -128,4 +126,4 @@ class Fases(MenuBase):
             (790, 479),
         ]
         background = join('images', 'MenuSemfases.png')
-        super().__init__("FASES", opcoes, background, botoes_posicoes=botoes_posicoes, botao_largura=120, botao_altura=48)
+        super().__init__("FASES", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=120, botao_altura=48)

@@ -16,6 +16,8 @@ from entrada import InputManager
 from Eletronica import receiver
 from custom_cursor import desenhar_cursor
 
+import cProfile
+
 class Jogo:
     def __init__(self):
         pygame.init()
@@ -24,8 +26,8 @@ class Jogo:
         pygame.display.set_caption("Shaolin Shapes")
         self.clock = pygame.time.Clock()
         self.jogando = True
-        self.manager = GSM.Gerenciador()
         self.input_manager = InputManager()
+        self.manager = GSM.Gerenciador(self.input_manager)
 
     def rodar(self):
         while self.jogando:
