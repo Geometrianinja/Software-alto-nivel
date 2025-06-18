@@ -56,11 +56,16 @@ class Forma(ABC):
         pass
 
     @abstractmethod
-    def desenhar(self, tela: pg.Surface, cor=None, pos=None, bordas=True) -> None:
+    def desenhar(self, tela: pg.Surface) -> None:
         """Desenha a forma na tela.
         Se cor for None, usa a cor da forma.
         Se pos for None, usa a posição atual da forma.
         """
+        pass
+
+    @abstractmethod
+    def desenhar_com_sombra(self, tela: pg.Surface, deslocamento_sombra: Vector2 = Vector2(5, 5)) -> None:
+        """Desenha a forma com uma sombra"""
         pass
 
     @abstractmethod
@@ -73,9 +78,6 @@ class Forma(ABC):
         """
         pass
 
-    def desenhar_com_sombra(self, tela: pg.Surface, cor_sombra: tuple[int, int, int] = (0, 0, 0), deslocamento_sombra: float = 3) -> None:
-        self.desenhar(tela, cor_sombra, (self.posicao.x + deslocamento_sombra, self.posicao.y + deslocamento_sombra), bordas=False)
-        self.desenhar(tela, self.cor, (self.posicao.x, self.posicao.y))
 
     def atualizar(self, delta_time: float) -> None:
         """Atualiza a posição da forma com base na gravidade."""
@@ -153,6 +155,17 @@ class Poligono(Forma):
         baricentro = _baricentro(vertices)
         self.vertices = [v - baricentro for v in vertices]
 
+        downscale_factor = 2
+        self.lado = max(max(abs(v.x), abs(v.y)) for v in self.vertices) * 2 * downscale_factor + 4
+        self.surface = pg.Surface((self.lado, self.lado), pg.SRCALPHA)
+        points_in_texture = [v*downscale_factor + Vector2(self.lado/2, self.lado/2) for v in self.vertices]
+        pg.draw.polygon(self.surface, cor, points_in_texture)
+        pg.draw.lines(self.surface, (0, 0, 0), True, points_in_texture, width=3)
+        self.surface=pg.transform.smoothscale_by(self.surface, 1/downscale_factor)
+        self.sombra = pg.Surface((self.lado, self.lado), pg.SRCALPHA)
+        pg.draw.polygon(self.sombra, (cor[0]//3, cor[1]//3, cor[2]//3, 180), points_in_texture)
+        self.sombra = pg.transform.smoothscale_by(self.sombra, 1/downscale_factor)
+
     def colide_com_ponto(self, ponto: Vector2 | Sequence[float]) -> bool:
         ponto = _sequence_to_vector2(ponto)  # Garante que ponto é um Vector2
 
@@ -193,8 +206,8 @@ class Poligono(Forma):
     def global_to_local(self, ponto: Vector2) -> Vector2:
         return (ponto - self.posicao).rotate(-self.rotacao)
     
-    def local_to_global(self, ponto: Vector2) -> Vector2:
-        return ponto.rotate(self.rotacao) + self.posicao
+    def local_to_global(self, ponto: Vector2, deslocamento: Vector2 = Vector2(0, 0)) -> Vector2:
+        return ponto.rotate(self.rotacao) + self.posicao + deslocamento
 
     def cortar(self, ponto: Vector2 | Sequence[float | int], v: Vector2 | Sequence[float | int], vel_separacao:float=60) -> list['Poligono']:
         """
@@ -257,7 +270,7 @@ class Poligono(Forma):
         
         out = []
         for vertices in new_poligonos:
-            poligono = Poligono(vertices, (self.cor[0]//3, self.cor[1]//3, self.cor[2]//3), self.gravidade, self.tipo)
+            poligono = Poligono(vertices, (self.cor[0] // 3, self.cor[1] // 3, self.cor[2] // 3), self.gravidade, self.tipo)
             baricentro = _baricentro(vertices)
             poligono.posicao = self.local_to_global(baricentro)
             poligono.rotacao = self.rotacao
@@ -274,17 +287,21 @@ class Poligono(Forma):
             out.append(poligono)
 
         return out
+    
 
-    def desenhar(self, tela: pg.Surface, cor=None, pos=None, bordas=True) -> None:
-        if cor is None:
-            cor = self.cor
-        if pos is None:
-            pos = (self.posicao.x, self.posicao.y)
-        
-        pontos = [self.local_to_global(v) for v in self.vertices]
-        pg.draw.polygon(tela, cor, pontos)
-        if bordas:
-            pg.draw.polygon(tela, (0, 0, 0), pontos, 1)
+
+    def desenhar(self, tela: pg.Surface) -> None:
+        """Desenha o polígono na tela."""
+        rotacionada = pg.transform.rotozoom(self.surface, -self.rotacao, 1)
+        lado = rotacionada.get_width()
+        tela.blit(rotacionada, (self.posicao.x - lado / 2, self.posicao.y - lado / 2))
+
+    def desenhar_com_sombra(self, tela: pg.Surface, deslocamento_sombra: Vector2 = Vector2(5, 5)) -> None:
+        """Desenha o polígono com uma sombra."""
+        rotacionada = pg.transform.rotozoom(self.sombra, -self.rotacao, 1)
+        lado = rotacionada.get_width()
+        tela.blit(rotacionada, (self.posicao.x - lado / 2 + deslocamento_sombra.x, self.posicao.y - lado / 2 + deslocamento_sombra.y))
+        self.desenhar(tela)
 
     
 def _get_points_from_lengths_and_angles(lengths: Sequence[float], angles: Sequence[float]) -> list[Vector2]:

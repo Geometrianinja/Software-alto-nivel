@@ -179,7 +179,7 @@ class FaseBase(ABC):
 
         for forma_list in [self.formas_cortadas, self.formas]:
             for forma in forma_list:
-                forma.desenhar_com_sombra(tela, (forma.cor[0] // 3, forma.cor[1] // 3, forma.cor[2] // 3))
+                forma.desenhar_com_sombra(tela)
 
         for txt in self.textos:
             tela.blit(self.surf[txt], self.rect[txt])
@@ -188,6 +188,7 @@ class FaseBase(ABC):
         """
         Atualiza o estado das formas na tela, processando interações do jogador e removendo formas antigas.
         """
+        mouse_vel_vector = Vector2(self.input_manager.mouse_diff)/self.input_manager.dt
         for idx in range(len(self.formas)-1, -1, -1):
             forma = self.formas[idx]
             if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
@@ -197,13 +198,20 @@ class FaseBase(ABC):
                     print(forma.tipo)
                     self.erros += 1
 
-                mouse_vel_vector = Vector2(self.input_manager.mouse_diff)/self.input_manager.dt
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
                 self.formas_cortadas.extend(cortes)  # Adiciona as formas cortadas à lista de cortadas
                 self.formas.pop(idx)  # Remove a forma cortada da lista
 
                 self.agendar_forma(forma.tipo, self.delay_forma)
 
+        """
+        for idx in range(len(self.formas_cortadas)-1, -1, -1):
+            forma = self.formas_cortadas[idx]
+            if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
+                cortes = forma.cortar(self.input_manager.mouse_pos, mouse_vel_vector)
+                self.formas_cortadas.pop(idx)  # Remove a forma cortada da lista
+                self.formas_cortadas.extend(cortes)  # Adiciona as novas formas cortadas
+        """
 
         for idx_lista, forma_list in enumerate([self.formas, self.formas_cortadas]):
             for idx in range(len(forma_list)-1, -1, -1):
