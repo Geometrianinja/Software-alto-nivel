@@ -57,6 +57,7 @@ class FaseBase(ABC):
         self.tempo_excluir: float = 0.5                                     # Tempo (em segundos) até excluir uma forma após acerto
         self.delay_forma: float = 4                                         # Delay entre uma forma e outra (em segundos)
         self.contador_delay: float = 0                                      # Contador que acumula os segundos
+        self.tempo_fim_da_fase = 0                                          # Marca quando a fase deve ser finalizada
 
         # === Métricas da Fase ===
         self.cortes_totais = 0                                              # Número total de formas cortadas (acertos)
@@ -249,9 +250,12 @@ class FaseBase(ABC):
             return self.restart_state
 
         if self.max_cortes > 0 and self.cortes_totais >= self.max_cortes:
+            if(not self.completou):
+                self.end = pygame.time.get_ticks() + 200
             self.completou = True
-            self.reset()
-            return self.next_state
+            if(self.end <= pygame.time.get_ticks()):
+                self.reset()
+                return self.next_state
         self.gerar_contador()
         return self.state_name
 
