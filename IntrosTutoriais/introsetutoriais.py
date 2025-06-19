@@ -1,7 +1,9 @@
 import pygame
+import config
+from formas import *
 
 class SlideShowBase:
-    def __init__(self, estado_name, imagens, proximo_estado, input_manager, legendas, x, y, largura_maxima):
+    def __init__(self, estado_name, imagens, proximo_estado, input_manager, legendas, x, y, largura_maxima, formas):
         self.estado_name = estado_name
         self.imagens = [pygame.image.load(img).convert_alpha() for img in imagens]
         self.index = 0
@@ -15,12 +17,14 @@ class SlideShowBase:
         self.texto_mostrado = ""        
         self.texto_index = 0            
         self.tempo_ultima_letra = 0     
-        self.velocidade_texto = 35       
+        self.velocidade_texto = 35      
         self.legendas = self.carregar_legendas_em_blocos(legendas)
+        
+        self.formas = formas
 
     def carregar_legendas_em_blocos(self, caminho_arquivo):
         with open(caminho_arquivo, 'r', encoding='utf-8') as f:
-            linhas = f.read().split('\n\n')  # separa por parágrafos (linhas em branco)
+            linhas = f.read().split('\n\n')
             return [bloco.replace('\n', ' ') for bloco in linhas if bloco.strip()]
 
     def reset(self):
@@ -84,6 +88,11 @@ class SlideShowBase:
                 superficie = self.fonte.render(linha, True, (0, 0, 0))  
                 tela.blit(superficie, (self.pos_x, self.pos_y + i * 28))  
 
+        if self.index < len(self.formas):
+            for forma in self.formas[self.index]:
+                forma.desenhar(tela)
+
+                
 
 class Intro0(SlideShowBase):
     def __init__(self, input_manager):
@@ -94,7 +103,8 @@ class Intro0(SlideShowBase):
         pos_x = 250
         pos_y = 40
         largura_max = 400  
-        super().__init__("INTRO0", imagens, "TUTORIAL0", input_manager, legendas, pos_x, pos_y, largura_max)
+        formas = [[] for _ in range(2)]
+        super().__init__("INTRO0", imagens, "TUTORIAL0", input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial0(SlideShowBase):
     def __init__(self, input_manager):
@@ -105,7 +115,28 @@ class Tutorial0(SlideShowBase):
         pos_x = 150
         pos_y = 90
         largura_max = 740  
-        super().__init__("TUTORIAL0", imagens,  "FASE00_" , input_manager, legendas, pos_x, pos_y, largura_max)
+
+        circulo_branco = Circulo(15, pygame.Color("white"), 0)
+        circulo_branco.posicao = Vector2(config.LARGURA // 2 - 30, config.ALTURA // 2 - 150)
+        circulo_branco.velocidade = Vector2(0, 0)
+        circulo_branco.velocidade_rotacao = (0)
+
+        circulo_vermelho = Circulo(15, pygame.Color("red"), 0)
+        circulo_vermelho.posicao = Vector2(config.LARGURA // 2 + 5, config.ALTURA // 2 - 150)
+        circulo_vermelho.velocidade = Vector2(0, 0)
+        circulo_vermelho.velocidade_rotacao = (0)
+
+        circulo_vermelho1 = Circulo(15, pygame.Color("red"), 0)
+        circulo_vermelho1.posicao = Vector2(config.LARGURA // 2 + 210, config.ALTURA // 2 - 150)
+        circulo_vermelho1.velocidade = Vector2(0, 0)
+        circulo_vermelho1.velocidade_rotacao = (0)
+        formas = [[] for _ in range(6)]
+        formas[1] = [circulo_branco]
+        formas[2] = [circulo_vermelho]
+        formas[5] = [circulo_vermelho1]
+
+
+        super().__init__("TUTORIAL0", imagens,  "FASE00_" , input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial0_(SlideShowBase):
     def __init__(self, input_manager):
@@ -116,7 +147,18 @@ class Tutorial0_(SlideShowBase):
         pos_x = 150
         pos_y = 90
         largura_max = 740  
-        super().__init__("TUTORIAL0_", imagens, "FASE00", input_manager, legendas, pos_x, pos_y, largura_max)
+        formas = [[] for _ in range(4)]
+        super().__init__("TUTORIAL0_", imagens, "FASE00", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+
+class PosFase00(SlideShowBase):
+    def __init__(self, input_manager):
+        imagens = ["images/pos1FASE0jogo.png"] + ["images/pos2FASE0jogo.png" for _ in range(4)]
+        legendas = "Posfase/Posfase_0.txt"
+        pos_x = 450
+        pos_y = 100
+        largura_max = 380 
+        formas = [[] for _ in range(5)]
+        super().__init__("POSFASE00", imagens, "FASES", input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Intro1(SlideShowBase):
     def __init__(self, input_manager):
@@ -127,7 +169,8 @@ class Intro1(SlideShowBase):
         pos_x = 250
         pos_y = 40
         largura_max = 400  
-        super().__init__("INTRO1", imagens, "TUTORIAL1", input_manager, legendas, pos_x, pos_y, largura_max)
+        formas = [[] for _ in range(4)]
+        super().__init__("INTRO1", imagens, "TUTORIAL1", input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial1(SlideShowBase):
     def __init__(self, input_manager):
@@ -139,4 +182,5 @@ class Tutorial1(SlideShowBase):
         pos_x = 250
         pos_y = 40
         largura_max = 400  
-        super().__init__("TUTORIAL1", imagens, "FASE01", input_manager, legendas, pos_x, pos_y, largura_max)
+        formas = [[] for _ in range(2)]
+        super().__init__("TUTORIAL1", imagens, "FASE01", input_manager, legendas, pos_x, pos_y, largura_max, formas)

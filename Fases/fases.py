@@ -310,7 +310,7 @@ class Fase00(FaseBase):
         super().__init__(
             state_name, restart_state, qtd_iniciais, titulo, 
             cor_titulo, cor_contador, CoresFormas,
-            contador_cortes, alvo, input_manager, max_cortes = 10, max_erros = 3,
+            contador_cortes, alvo, input_manager, max_cortes = 52, max_erros = 3,
             background_path=background, next_state= "POSFASE00"
         )
 
