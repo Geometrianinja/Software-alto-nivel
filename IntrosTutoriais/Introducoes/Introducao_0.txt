@@ -1,0 +1,5 @@
+Olá, eu sou o Euler e soube que você
+deseja aprender Kung Fu.
+
+Para começar o seu treinamento, iremos 
+aprender a utilizar o bastão.

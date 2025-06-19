@@ -47,23 +47,23 @@ class FaseBase(ABC):
         self.altura = config.ALTURA                                         # Altura da tela
 
         # === Controle de Formas ===
-        self.formas: list[formas.Forma] = []                                                    # Formas atualmente na tela
-        self.fila_formas: list[tuple[float, formas.Forma]] = []                                               # Formas agendadas para aparecer com delay
-        self.formas_cortadas: list[formas.Forma] = []                                          # Formas que foram cortadas
+        self.formas: list[formas.Forma] = []                                # Formas atualmente na tela
+        self.fila_formas: list[tuple[float, formas.Forma]] = []             # Formas agendadas para aparecer com delay
+        self.formas_cortadas: list[formas.Forma] = []                       # Formas que foram cortadas
         self.limite_max_formas = 6                                          # Máximo de formas simultâneas na tela
         self.gravidade = 150                                                # Gravidade aplicada às formas
 
         # === Controle de Tempo e Delay ===
-        self.tempo_excluir: float = 0.5                                             # Tempo (em segundos) até excluir uma forma após acerto
-        self.delay_forma: float = 4                                              # Delay entre uma forma e outra (em segundos)
-        self.contador_delay: float = 0                                             # Contador que acumula os segundos
+        self.tempo_excluir: float = 0.5                                     # Tempo (em segundos) até excluir uma forma após acerto
+        self.delay_forma: float = 4                                         # Delay entre uma forma e outra (em segundos)
+        self.contador_delay: float = 0                                      # Contador que acumula os segundos
 
         # === Métricas da Fase ===
         self.cortes_totais = 0                                              # Número total de formas cortadas (acertos)
         self.erros = 0                                                      # Número de erros cometidos (formas cortadas erradas)
         self.completou = False                                              # Indica se o objetivo da fase foi alcançado
 
-        self.input_manager = input_manager                            # Gerenciador de entradas do jogador
+        self.input_manager = input_manager                                  # Gerenciador de entradas do jogador
         # === Inicialização de Recursos ===
         self.gerar_imagens()                                                # Gera imagens dos textos ou recursos visuais
 
@@ -351,4 +351,41 @@ class Fase01(FaseBase):
             cor_titulo, cor_contador, CoresFormas,
             contador_cortes, alvo, input_manager, max_cortes=10, max_erros=3,
             background_path=background, next_state="POSFASE01"
+        )
+
+
+class Fase00_(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        state_name = "FASE00_"
+        restart_state = "TUTORIAL0"
+        titulo = "Tutorial"
+        background = join('images', 'FASE0jogo.png')
+        cor_titulo = pygame.Color("black")
+        cor_contador = pygame.Color("black")
+
+        qtd_iniciais = {
+            "Círculo": 1,
+        }
+
+        contador_cortes = {
+            "Círculo": 0,
+            "Triângulo Equilátero": 0,
+            "Ângulo": 0
+        }
+
+        alvo = ["Círculo"]
+
+        CoresFormas = [
+            pygame.Color("darkolivegreen3"),
+            pygame.Color("darkorchid1"),
+            pygame.Color("yellow"),
+            pygame.Color("steelblue1"),
+            pygame.Color("orange1"),
+        ]
+
+        super().__init__(
+            state_name, restart_state, qtd_iniciais, titulo, 
+            cor_titulo, cor_contador, CoresFormas,
+            contador_cortes, alvo, input_manager, max_cortes = 1, max_erros = 3,
+            background_path=background, next_state= "TUTORIAL0_"
         )

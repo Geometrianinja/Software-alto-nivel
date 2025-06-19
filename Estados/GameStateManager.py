@@ -26,6 +26,8 @@ class Gerenciador:
             "CONTROL": menu_config.ConfigControle(input_manager),
             "INTRO0": introsetutoriais.Intro0(input_manager),
             "TUTORIAL0": introsetutoriais.Tutorial0(input_manager),
+            "TUTORIAL0_": introsetutoriais.Tutorial0_(input_manager),
+            "FASE00_" : fases.Fase00_(config.LARGURA, config.ALTURA, self.input_manager),
             "FASE00" : fases.Fase00(config.LARGURA, config.ALTURA, self.input_manager),
             "POSFASE00": posfase.PosFase00(self.input_manager),  
             "MENU"   : menu.MenuPrincipal(self.input_manager), 
