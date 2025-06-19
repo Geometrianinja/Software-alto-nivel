@@ -3,15 +3,6 @@ import pygame
 import config
 import Estados.GameStateManager as GSM
 
-import serial
-import struct
-import asyncio
-import threading
-import time
-import os
-import sys
-import win32api
-
 from entrada import InputManager
 from Eletronica import receiver
 from custom_cursor import desenhar_cursor
