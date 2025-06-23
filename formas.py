@@ -364,7 +364,23 @@ class TrianguloEquilatero(Triangulo):
         p2 = Vector2(-lado / 2, altura * 2 / 3)
         p3 = Vector2(lado / 2, altura * 2 / 3)
         super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Equilátero")
-        self.lado = lado
+        #self.lado = lado
+
+class TrianguloIsoceles(Triangulo):
+    def __init__(self, lado: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
+        altura = (lado ** 2 - (base ** 2) / 4) ** (1/2)
+        p1 = Vector2(0, altura)
+        p2 = Vector2(-base / 2, 0)
+        p3 = Vector2(base / 2, 0)
+        super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Isóceles")
+
+class TrianguloRetangulo(Triangulo):
+    def __init__(self, altura: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
+        p1 = Vector2(0, altura)
+        p2 = Vector2(0, 0)
+        p3 = Vector2(base, 0)
+        super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Retângulo")
+
 
 class Estrela(Poligono):
     def __init__(self, tamanho: float, cor: tuple[int, int, int], gravidade: float = 50):

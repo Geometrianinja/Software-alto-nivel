@@ -4,7 +4,7 @@ from math import acos, pi, cos, sin
 
 
 class Cursor:
-    def __init__(self, raio, screen:pg.Surface, beta=0.0006, alpha=0.015, trail_length=6, pos0:Vector2 = Vector2(0, 0), color=(255, 255, 255)):
+    def __init__(self, raio, input_manager, color,screen:pg.Surface, beta=0.0006, alpha=0.015, trail_length=6, pos0:Vector2 = Vector2(0, 0)):
 
         self.raio = raio
         self.beta = beta
@@ -16,6 +16,7 @@ class Cursor:
         self.screen = screen
         self.last_vel_mag = 0
         self.last_vel = Vector2(1, 0)
+        self.input_manager = input_manager
 
     def update(self, pos: Vector2, dt: float):
         self.pos = pos
@@ -23,7 +24,14 @@ class Cursor:
         if len(self.trail) > self.trail_length:
             self.trail.pop(0)
 
-    def draw(self, pos: Vector2, dt: float):
+    def draw(self):
+        if(self.input_manager.mouse_left_pressed or self.input_manager.cont_select_pressed):
+            color = self.color[1]
+        else:
+            color = self.color[0]
+
+        pos = Vector2(*self.input_manager.mouse_pos)
+        dt = self.input_manager.dt
         self.update(pos, dt)
 
         velocity = (self.pos - self.trail[-3]) / (2*dt) if dt > 0 else Vector2(0, 0)
@@ -51,10 +59,10 @@ class Cursor:
             p2 = middle + u_vel_r.rotate_rad(alpha)
             p3 = middle + u_vel_r.rotate_rad(pi - alpha)
             p4 = middle + u_vel_r.rotate_rad(pi + alpha)
-            pg.draw.polygon(high_res, self.color, [p1, p2, middle + u_vel*d])
-            pg.draw.polygon(high_res, self.color, [p3, p4, middle - u_vel*d])
-        pg.draw.circle(high_res, self.color, (int(middle.x), int(middle.y)), int(r))
+            pg.draw.polygon(high_res, color, [p1, p2, middle + u_vel*d])
+            pg.draw.polygon(high_res, color, [p3, p4, middle - u_vel*d])
+        pg.draw.circle(high_res, color, (int(middle.x), int(middle.y)), int(r))
         high_res = pg.transform.rotozoom(high_res, 0, 1/scale)
         self.screen.blit(high_res, (self.pos.x - side / scale / 2, self.pos.y - side / scale / 2))
         if len(self.trail) > 1:
-            pg.draw.lines(self.screen, self.color, False, self.trail, 2)
+            pg.draw.lines(self.screen, color, False, self.trail, 2)

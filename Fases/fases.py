@@ -16,7 +16,7 @@ class FaseBase(ABC):
     def __init__(
         self, state_name, restart_state, qtd_inicial, 
         titulo, cor_titulo, cor_contador, CoresFormas,
-        contador_cortes, alvo, input_manager, max_cortes=10,
+        alvo, input_manager, max_cortes=10,
         max_erros=0, background_path: Optional[str]=None,
         next_state="FASES"
     ):
@@ -30,7 +30,7 @@ class FaseBase(ABC):
         self.cor_contador = cor_contador                                    # Cor do contador
         self.CoresFormas = CoresFormas                                      # Dicionário de cores das formas
         self.qtd_inicial = qtd_inicial                                      # Quantidade inicial de formas por tipo
-        self.contador_cortes = contador_cortes                              # Dicionário de cortes realizados por tipo
+        self.contador_cortes = qtd_inicial.copy()                           # Dicionário de cortes realizados por tipo
         self.max_cortes = max_cortes                                        # Número máximo de cortes para passar de nível
         self.max_erros = max_erros                                          # Número máximo de erros permitidos
         self.alvo = alvo                                                    # Lista de tipos de formas que são o "alvo" correto
@@ -63,6 +63,9 @@ class FaseBase(ABC):
         self.cortes_totais = 0                                              # Número total de formas cortadas (acertos)
         self.erros = 0                                                      # Número de erros cometidos (formas cortadas erradas)
         self.completou = False                                              # Indica se o objetivo da fase foi alcançado
+
+        for forma in self.contador_cortes.keys():
+            self.contador_cortes[forma] = 0
 
         self.input_manager = input_manager                                  # Gerenciador de entradas do jogador
         # === Inicialização de Recursos ===
@@ -126,7 +129,11 @@ class FaseBase(ABC):
         elif tipo == "Quadrado":
             forma = Quadrado(100, cor, self.gravidade)
         elif tipo == "Triângulo Equilátero":
-            forma = TrianguloEquilatero(100, cor, self.gravidade)
+            forma = TrianguloEquilatero(120, cor, self.gravidade)
+        elif tipo == "Triângulo Isóceles":
+            forma = TrianguloIsoceles(100, 40, cor, self.gravidade)
+        elif tipo == "Triângulo Retângulo":
+            forma = TrianguloRetangulo(90, 120, cor, self.gravidade)
         elif tipo == "Estrela":
             forma = Estrela(80, cor, self.gravidade)
         elif tipo == "Ângulo":
@@ -292,15 +299,6 @@ class Fase00(FaseBase):
             "Ângulo": 1
         }
 
-        contador_cortes = {
-            "Círculo": 0,
-            "Quadrado": 0,
-            "Triângulo Equilátero": 0,
-            "Retângulo": 0,
-            "Estrela": 0,
-            "Ângulo": 0
-        }
-
         alvo = ["Círculo", "Quadrado", "Triângulo Equilátero", "Retângulo", "Estrela", "Ângulo"]
 
         CoresFormas = [
@@ -314,7 +312,7 @@ class Fase00(FaseBase):
         super().__init__(
             state_name, restart_state, qtd_iniciais, titulo, 
             cor_titulo, cor_contador, CoresFormas,
-            contador_cortes, alvo, input_manager, max_cortes = 52, max_erros = 3,
+            alvo, input_manager, max_cortes = 52, max_erros = 3,
             background_path=background, next_state= "POSFASE00"
         )
 
@@ -328,20 +326,15 @@ class Fase01(FaseBase):
         cor_contador = pygame.Color("black")
 
         qtd_iniciais = {
-            "Círculo": 1,
-            "Quadrado": 1,
+            "Círculo": 0,
+            "Quadrado": 0,
             "Triângulo Equilátero": 1,
+            "Triângulo Isóceles" : 2,
+            "Triângulo Retângulo" : 2,
             "Retângulo": 0
         }
 
         alvo = ["Triângulo Equilátero"]
-
-        contador_cortes = {
-            "Círculo": 0,
-            "Quadrado": 0,
-            "Triângulo Equilátero": 0,
-            "Retângulo": 0
-        }
 
         CoresFormas = [
             pygame.Color("darkolivegreen3"),
@@ -354,7 +347,7 @@ class Fase01(FaseBase):
         super().__init__(
             state_name, restart_state, qtd_iniciais, titulo, 
             cor_titulo, cor_contador, CoresFormas,
-            contador_cortes, alvo, input_manager, max_cortes=10, max_erros=3,
+            alvo, input_manager, max_cortes=10, max_erros=3,
             background_path=background, next_state="POSFASE01"
         )
 
@@ -372,12 +365,6 @@ class Fase00_(FaseBase):
             "Círculo": 1,
         }
 
-        contador_cortes = {
-            "Círculo": 0,
-            "Triângulo Equilátero": 0,
-            "Ângulo": 0
-        }
-
         alvo = ["Círculo"]
 
         CoresFormas = [
@@ -391,6 +378,6 @@ class Fase00_(FaseBase):
         super().__init__(
             state_name, restart_state, qtd_iniciais, titulo, 
             cor_titulo, cor_contador, CoresFormas,
-            contador_cortes, alvo, input_manager, max_cortes = 1, max_erros = 3,
+            alvo, input_manager, max_cortes = 1, max_erros = 3,
             background_path=background, next_state= "TUTORIAL0_"
         )
