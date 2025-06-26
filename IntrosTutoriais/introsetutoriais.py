@@ -141,13 +141,16 @@ class Tutorial0(SlideShowBase):
 class Tutorial0_(SlideShowBase):
     def __init__(self, input_manager):
         imagens = [
-            "images/FASE0tutorial.png" for _ in range(4)
+            "images/FASE0tutorial.png" for _ in range(3)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_0_.txt"
+
         pos_x = 150
         pos_y = 90
-        largura_max = 740  
-        formas = [[] for _ in range(4)]
+        largura_max = 740 
+
+        formas = [[] for _ in range(2)]
+ 
         super().__init__("TUTORIAL0_", imagens, "FASE00", input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class PosFase00(SlideShowBase):
@@ -163,11 +166,11 @@ class PosFase00(SlideShowBase):
 class Intro1(SlideShowBase):
     def __init__(self, input_manager):
         imagens = [
-            "images/FASE1intro.png" for _ in range(4)
+            "images/FASE1intro.png" for _ in range(7)
         ]
         legendas = "IntrosTutoriais/Introducoes/Introducao_1.txt"
-        pos_x = 250
-        pos_y = 40
+        pos_x = 490
+        pos_y = 60
         largura_max = 400  
         formas = [[] for _ in range(4)]
         super().__init__("INTRO1", imagens, "TUTORIAL1", input_manager, legendas, pos_x, pos_y, largura_max, formas)
@@ -175,12 +178,35 @@ class Intro1(SlideShowBase):
 class Tutorial1(SlideShowBase):
     def __init__(self, input_manager):
         imagens = [
-            "images/FASE1tutorial.png",
-            "images/FASE1tutorial.png",
+            "images/FASE1tutorial.png" for _ in range(5)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_1.txt"
         pos_x = 250
-        pos_y = 40
-        largura_max = 400  
-        formas = [[] for _ in range(2)]
+        pos_y = 80
+        largura_max = 600 
+
+        triEqui = TrianguloEquilatero(70, pygame.Color("black"), 0)
+        triEqui.posicao= Vector2(config.LARGURA // 2 , config.ALTURA // 2-20 )
+
+        triIso = TrianguloIsoceles(100,40, pygame.Color("black"), 0)
+        triIso.posicao = Vector2(config.LARGURA // 2 , config.ALTURA // 2  - 40)
+
+        triEsca = TrianguloRetangulo(60,80, pygame.Color("black"), 0)
+        triEsca.posicao = Vector2(config.LARGURA // 2 , config.ALTURA // 2 - 30 )
+
+        formas = [[] for _ in range(6)]
+        formas[1] = [triEqui]
+        formas[2] = [triIso]
+        formas[3] = [triEsca]
+ 
         super().__init__("TUTORIAL1", imagens, "FASE01", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+
+class PosFase01(SlideShowBase):
+    def __init__(self, input_manager):
+        imagens = ["images/pos1FASE1jogo.png"] + ["images/pos2FASE1.png" for _ in range(5)]+["images/pos3FASE1.png"] 
+        legendas = "Posfase/Posfase_1.txt"
+        pos_x = 400
+        pos_y = 80
+        largura_max = 430 
+        formas = [[] for _ in range(7)]
+        super().__init__("POSFASE01", imagens, "FASES", input_manager, legendas, pos_x, pos_y, largura_max, formas)

@@ -36,7 +36,7 @@ class Gerenciador:
             "INTRO1": introsetutoriais.Intro1(input_manager),
             "TUTORIAL1": introsetutoriais.Tutorial1(input_manager),
             "FASE01" : fases.Fase01(config.LARGURA, config.ALTURA, self.input_manager),
-            "POSFASE01": posfase.PosFase01(self.input_manager),
+            "POSFASE01": introsetutoriais.PosFase01(self.input_manager),
 
             }
         

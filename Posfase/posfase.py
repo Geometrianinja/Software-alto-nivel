@@ -40,11 +40,13 @@ class PosFase00(PosFaseSlideShow):
 
 
 # Pós-fase da Fase 1
-class PosFase01(PosFaseSlideShow):
+class PosFase1(PosFaseSlideShow):
     def __init__(self, input_manager):
-        imagens = [
+        imagens = [ 
             "images/pos1FASE1jogo.png",
-            "images/pos2FASE1jogo.png",
-            
-        ]
+            "images/pos2FASE1jogo.png" ]
+        
+        
+        legendas = "IntrosTutoriais/Tutoriais/Tutorial_0.txt"
+       
         super().__init__("POSFASE01", imagens, input_manager, "FASES")
