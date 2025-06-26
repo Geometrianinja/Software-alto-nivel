@@ -200,7 +200,8 @@ class FaseBase(ABC):
         for idx in range(len(self.formas)-1, -1, -1):
             forma = self.formas[idx]
             if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
-                self.cortes_totais += 1
+                if forma.tipo in self.alvo:
+                    self.cortes_totais += 1
                 self.contador_cortes[forma.tipo] += 1
                 if forma.tipo not in self.alvo:
                     print(forma.tipo)
@@ -326,12 +327,9 @@ class Fase01(FaseBase):
         cor_contador = pygame.Color("black")
 
         qtd_iniciais = {
-            "Círculo": 0,
-            "Quadrado": 0,
             "Triângulo Equilátero": 1,
             "Triângulo Isóceles" : 2,
             "Triângulo Retângulo" : 2,
-            "Retângulo": 0
         }
 
         alvo = ["Triângulo Equilátero"]
