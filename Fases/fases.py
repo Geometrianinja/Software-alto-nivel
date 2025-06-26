@@ -117,7 +117,7 @@ class FaseBase(ABC):
         Raises:
             ValueError: Se o tipo informado não for reconhecido.
         """
-        velocidade = Vector2(random.uniform(-100, 100), random.uniform(-400, -250))
+        velocidade = Vector2(random.uniform(-150, 150), random.uniform(-400, -250))
         posicao = Vector2(self.largura // 2 - velocidade.x*3, self.altura + 60)
         vel_rotacao = random.uniform(-180, 180)
 
@@ -248,7 +248,10 @@ class FaseBase(ABC):
         for idx in range(len(self.fila_formas)-1, -1, -1):
             tempo, tipo = self.fila_formas[idx]
             if tempo < self.input_manager.time:
-                self.formas.append(self.criar_forma(tipo))
+                if len(self.formas) > 4:
+                    self.agendar_forma(tipo, 2)
+                else:
+                    self.formas.append(self.criar_forma(tipo))
                 self.fila_formas.pop(idx)
                 
         self.atualizar_formas()
