@@ -3,6 +3,7 @@ import pygame as pg
 from pygame.math import Vector2
 from typing import Sequence, Optional
 from math import pi, cos, sin, radians, tan
+from enum import Enum
 
 
 def reta_corta_segmento(p1: Vector2, p2: Vector2, p0: Vector2, v0: Vector2) -> Optional[tuple[Vector2, float, float]]:
@@ -35,15 +36,28 @@ def reta_corta_segmento(p1: Vector2, p2: Vector2, p0: Vector2, v0: Vector2) -> O
     
     return ponto_intersecao, t_seg, t_reta
 
+class TipoForma(Enum):
+    FORMA = -1
+    POLIGONO = 0
+    CIRCULO = 1
+    RETANGULO = 2
+    QUADRADO = 3
+    TRIANGULO = 4
+    TRIANGULO_EQUILATERO = 5
+    TRIANGULO_ISOCELES = 6
+    TRIANGULO_RETANGULO = 7
+    ESTRELA = 8
+    ANGULO = 9
+
 class Forma(ABC):
-    def __init__(self, cor, tipo: str, gravidade: float = 50):
+    def __init__(self, cor, gravidade: float = 50):
         self.cor: tuple[int, int, int] = cor
         self.gravidade: float = gravidade
         self.posicao: Vector2 = Vector2(0, 0)
         self.velocidade: Vector2 = Vector2(0, 0)
         self.rotacao: float = 0.0
         self.velocidade_rotacao: float = 0.0
-        self.tipo: str = tipo
+        self.tipo: TipoForma = TipoForma.FORMA
 
     @abstractmethod
     def colide_com_ponto(self, ponto: Vector2 | Sequence[float]) -> bool:
@@ -77,7 +91,6 @@ class Forma(ABC):
             v (Vector2 | Sequence[float]): Vetor que define a direção da partição.
         """
         pass
-
 
     def atualizar(self, delta_time: float) -> None:
         """Atualiza a posição da forma com base na gravidade."""
@@ -150,8 +163,9 @@ def _sequence_to_vector2(seq: Sequence[float] | Vector2) -> Vector2:
     return Vector2(seq[0], seq[1])
 
 class Poligono(Forma):
-    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50, tipo: str = "Polígono"):
-        super().__init__(cor, tipo, gravidade)
+    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50):
+        super().__init__(cor, gravidade)
+        self.tipo = TipoForma.POLIGONO
         baricentro = _baricentro(vertices)
         self.vertices = [v - baricentro for v in vertices]
 
@@ -270,7 +284,7 @@ class Poligono(Forma):
         
         out = []
         for vertices in new_poligonos:
-            poligono = Poligono(vertices, (self.cor[0] // 3, self.cor[1] // 3, self.cor[2] // 3), self.gravidade, self.tipo)
+            poligono = Poligono(vertices, (self.cor[0] // 3, self.cor[1] // 3, self.cor[2] // 3), self.gravidade)
             baricentro = _baricentro(vertices)
             poligono.posicao = self.local_to_global(baricentro)
             poligono.rotacao = self.rotacao
@@ -327,7 +341,7 @@ def _get_points_from_lengths_and_angles(lengths: Sequence[float], angles: Sequen
 
 
 class Circulo(Poligono):
-    def __init__(self, raio: float, cor: tuple[int, int, int], gravidade: float = 50, tipo: str = "Círculo"):
+    def __init__(self, raio: float, cor: tuple[int, int, int], gravidade: float = 50):
         self.raio = raio
         vertices = []
         num_vertices = 30
@@ -337,25 +351,29 @@ class Circulo(Poligono):
             y = raio * sin(angulo)
             vertices.append(Vector2(x, y))
         self.vertices = vertices
-        super().__init__(vertices, cor, gravidade, tipo)
+        super().__init__(vertices, cor, gravidade)
+        self.tipo = TipoForma.CIRCULO
 
 class Triangulo(Poligono):
-    def __init__(self, p1: Vector2, p2: Vector2, p3: Vector2, cor: tuple[int, int, int], gravidade: float = 50, tipo: str = "Triângulo"):
-        super().__init__([p1, p2, p3], cor, gravidade, tipo)
+    def __init__(self, p1: Vector2, p2: Vector2, p3: Vector2, cor: tuple[int, int, int], gravidade: float = 50):
+        super().__init__([p1, p2, p3], cor, gravidade)
+        self.tipo = TipoForma.TRIANGULO
 
 class Retangulo(Poligono):
-    def __init__(self, largura: float, altura: float, cor: tuple[int, int, int], gravidade: float = 50, tipo: str = "Retângulo"):
+    def __init__(self, largura: float, altura: float, cor: tuple[int, int, int], gravidade: float = 50):
         p1 = Vector2(0, 0)
         p2 = Vector2(largura, 0)
         p3 = Vector2(largura, altura)
         p4 = Vector2(0, altura)
-        super().__init__([p1, p2, p3, p4], cor, gravidade, tipo)
+        super().__init__([p1, p2, p3, p4], cor, gravidade)
+        self.tipo = TipoForma.RETANGULO
         self.largura = largura
         self.altura = altura
 
 class Quadrado(Retangulo):
     def __init__(self, lado: float, cor: tuple[int, int, int], gravidade: float = 50):
-        super().__init__(lado, lado, cor, gravidade, "Quadrado")
+        super().__init__(lado, lado, cor, gravidade)
+        self.tipo = TipoForma.QUADRADO
 
 class TrianguloEquilatero(Triangulo):
     def __init__(self, lado: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -363,8 +381,8 @@ class TrianguloEquilatero(Triangulo):
         p1 = Vector2(0, -altura / 3)
         p2 = Vector2(-lado / 2, altura * 2 / 3)
         p3 = Vector2(lado / 2, altura * 2 / 3)
-        super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Equilátero")
-        #self.lado = lado
+        super().__init__(p1, p2, p3, cor, gravidade)
+        self.tipo = TipoForma.TRIANGULO_EQUILATERO
 
 class TrianguloIsoceles(Triangulo):
     def __init__(self, lado: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -372,14 +390,16 @@ class TrianguloIsoceles(Triangulo):
         p1 = Vector2(0, altura)
         p2 = Vector2(-base / 2, 0)
         p3 = Vector2(base / 2, 0)
-        super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Isóceles")
+        super().__init__(p1, p2, p3, cor, gravidade)
+        self.tipo = TipoForma.TRIANGULO_ISOCELES
 
 class TrianguloRetangulo(Triangulo):
     def __init__(self, altura: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
         p1 = Vector2(0, altura)
         p2 = Vector2(0, 0)
         p3 = Vector2(base, 0)
-        super().__init__(p1, p2, p3, cor, gravidade, "Triângulo Retângulo")
+        super().__init__(p1, p2, p3, cor, gravidade)
+        self.tipo = TipoForma.TRIANGULO_RETANGULO
 
 
 class Estrela(Poligono):
@@ -393,7 +413,8 @@ class Estrela(Poligono):
             y2 = (tamanho / 3) * sin(angulo + pi / 5)
             pontos.append(Vector2(x, y))
             pontos.append(Vector2(x2, y2))
-        super().__init__(pontos, cor, gravidade, "Estrela")
+        super().__init__(pontos, cor, gravidade)
+        self.tipo = TipoForma.ESTRELA
 
 class Angulo(Poligono):
     def __init__(self, tamanho: float, espessura: float, angulo: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -402,6 +423,7 @@ class Angulo(Poligono):
             [tamanho, espessura, tamanho_costa, tamanho_costa, espessura],
             [180-angulo, -90, -90, -180+angulo, -90]
         )
-        super().__init__(pontos, cor, gravidade, "Ângulo")
+        super().__init__(pontos, cor, gravidade)
+        self.tipo = TipoForma.ANGULO
         self.tamanho = tamanho
         self.angulo = angulo

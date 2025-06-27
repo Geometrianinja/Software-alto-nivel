@@ -12,9 +12,54 @@ from typing import Optional
 from pygame.math import Vector2
 from math import atan2
 
+
+def criar_mini_forma(tipo: TipoForma, cor, largura=16) -> formas.Forma:
+    if tipo == TipoForma.CIRCULO:
+        forma = Circulo(largura/2, cor, 0)
+    elif tipo == TipoForma.RETANGULO:
+        forma = Retangulo(largura, largura*0.7, cor, 0)
+    elif tipo == TipoForma.QUADRADO:
+        forma = Quadrado(largura, cor, 0)
+    elif tipo == TipoForma.TRIANGULO_EQUILATERO:
+        forma = TrianguloEquilatero(largura, cor, 0)
+    elif tipo == TipoForma.TRIANGULO_ISOCELES:
+        forma = TrianguloIsoceles(largura*1.2, largura*0.8, cor, 0)
+    elif tipo == TipoForma.TRIANGULO_RETANGULO:
+        forma = TrianguloRetangulo(largura*0.8, largura, cor, 0)
+    elif tipo == TipoForma.ESTRELA:
+        forma = Estrela(largura, cor, 0)
+    elif tipo == TipoForma.ANGULO:
+        forma = Angulo(largura*0.8, largura*0.3, random.uniform(30, 180), cor, 0)
+    else:
+        raise ValueError(f"Tipo de forma desconhecido: {tipo}")
+    
+    return forma
+
+def criar_fileira_mini_formas(tipo: TipoForma, qtd: int, pos: Vector2, cor, largura=14) -> list[formas.Forma]:
+    """
+    Cria uma fileira de mini formas do tipo especificado.
+
+    Args:
+        tipo (TipoForma): Tipo da forma a ser criada.
+        qtd (int): Quantidade de formas a serem criadas.
+        largura (int, optional): Largura das formas. Default é 14.
+
+    Returns:
+        list[formas.Forma]: Lista de instâncias de formas criadas.
+    """
+    formas = []
+    for i in range(qtd):
+        posicao = Vector2(pos.x + i * largura * 1.2, pos.y)
+        forma = criar_mini_forma(tipo, cor, largura)
+        forma.posicao = posicao
+        formas.append(forma)
+
+    return formas
+
+
 class FaseBase(ABC):
     def __init__(
-        self, state_name, restart_state, qtd_inicial, 
+        self, state_name, restart_state, qtd_inicial: dict[TipoForma, int], 
         titulo, cor_titulo, cor_contador, CoresFormas,
         alvo, input_manager, max_cortes=10,
         max_erros=0, background_path: Optional[str]=None,
@@ -42,13 +87,16 @@ class FaseBase(ABC):
         self.font = pygame.font.Font("PressStart2P.ttf", 24)                # Fonte do título
         self.fonte_contador = pygame.font.Font("PressStart2P.ttf", 20)      # Fonte do contador
 
+        self.vidas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20), (255, 255, 255), largura=14)  # Fileira de vidas (mini formas)
+        self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20), (70, 70, 70), largura=14)  # Fileira de vidas mortas (mini formas)
+
         # === Dimensões da Tela ===
         self.largura = config.LARGURA                                       # Largura da tela
         self.altura = config.ALTURA                                         # Altura da tela
 
         # === Controle de Formas ===
         self.formas: list[formas.Forma] = []                                # Formas atualmente na tela
-        self.fila_formas: list[tuple[float, formas.Forma]] = []             # Formas agendadas para aparecer com delay
+        self.fila_formas: list[tuple[float, TipoForma]] = []             # Formas agendadas para aparecer com delay
         self.formas_cortadas: list[formas.Forma] = []                       # Formas que foram cortadas
         self.limite_max_formas = 6                                          # Máximo de formas simultâneas na tela
         self.gravidade = 150                                                # Gravidade aplicada às formas
@@ -85,16 +133,16 @@ class FaseBase(ABC):
                 self.agendar_forma(tipo, tempo)
                 tempo += 1.5
 
-    def agendar_forma(self, tipo, tempo):
+    def agendar_forma(self, tipo: TipoForma, tempo: float):
         """
         Agenda a criação de uma nova forma após um atraso (delay).
 
         Args:
-            tipo (str): O tipo da forma a ser criada.
+            tipo (TipoForma): O tipo da forma a ser criada.
             tempo (float): O tempo de atraso antes da criação da forma.
         """
         self.fila_formas.append((self.input_manager.time + tempo, tipo))
-    
+
     def get_qtd_formas(self) -> int:
         """
         Retorna a quantidade total de formas, incluindo as que estão na fila
@@ -104,12 +152,13 @@ class FaseBase(ABC):
         """
         return len(self.formas) + len(self.fila_formas)
 
-    def criar_forma(self, tipo):
+    
+    def criar_forma(self, tipo: TipoForma) -> formas.Forma:
         """
         Cria uma instância de forma com base no tipo fornecido.
 
         Args:
-            tipo (str): Tipo da forma a ser criada (ex: "Círculo", "Quadrado").
+            tipo (TipoForma): Tipo da forma a ser criada.
 
         Returns:
             Forma: Uma instância da forma solicitada.
@@ -122,21 +171,21 @@ class FaseBase(ABC):
         vel_rotacao = random.uniform(-180, 180)
 
         cor = random.choice(self.CoresFormas)
-        if tipo == "Círculo":
+        if tipo == TipoForma.CIRCULO:
             forma = Circulo(50, cor, self.gravidade)
-        elif tipo == "Retângulo":
+        elif tipo == TipoForma.RETANGULO:
             forma = Retangulo(110, 70, cor, self.gravidade)
-        elif tipo == "Quadrado":
+        elif tipo == TipoForma.QUADRADO:
             forma = Quadrado(100, cor, self.gravidade)
-        elif tipo == "Triângulo Equilátero":
+        elif tipo == TipoForma.TRIANGULO_EQUILATERO:
             forma = TrianguloEquilatero(120, cor, self.gravidade)
-        elif tipo == "Triângulo Isóceles":
+        elif tipo == TipoForma.TRIANGULO_ISOCELES:
             forma = TrianguloIsoceles(100, 40, cor, self.gravidade)
-        elif tipo == "Triângulo Retângulo":
+        elif tipo == TipoForma.TRIANGULO_RETANGULO:
             forma = TrianguloRetangulo(90, 120, cor, self.gravidade)
-        elif tipo == "Estrela":
+        elif tipo == TipoForma.ESTRELA:
             forma = Estrela(80, cor, self.gravidade)
-        elif tipo == "Ângulo":
+        elif tipo == TipoForma.ANGULO:
             forma = Angulo(70, 30, random.uniform(30, 180), cor, self.gravidade)
         else:
             raise ValueError(f"Tipo de forma desconhecido: {tipo}")
@@ -145,7 +194,6 @@ class FaseBase(ABC):
         forma.velocidade = velocidade
         forma.velocidade_rotacao = vel_rotacao
         return forma
-
 
     def gerar_imagens(self):
         """
@@ -189,8 +237,11 @@ class FaseBase(ABC):
             for forma in forma_list:
                 forma.desenhar_com_sombra(tela)
 
-        for txt in self.textos:
-            tela.blit(self.surf[txt], self.rect[txt])
+        for i in range(len(self.vidas)):
+            if i < self.cortes_totais:
+                self.vidas[i].desenhar(tela)
+            else:
+                self.vidas_mortas[i].desenhar(tela)
 
     def atualizar_formas(self):
         """
@@ -205,6 +256,9 @@ class FaseBase(ABC):
                 self.contador_cortes[forma.tipo] += 1
                 if forma.tipo not in self.alvo:
                     print(forma.tipo)
+                    self.cortes_totais -= 2
+                    if self.cortes_totais < 0:
+                        self.cortes_totais = 0
                     self.erros += 1
 
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
@@ -212,15 +266,6 @@ class FaseBase(ABC):
                 self.formas.pop(idx)  # Remove a forma cortada da lista
 
                 self.agendar_forma(forma.tipo, self.delay_forma)
-
-        """
-        for idx in range(len(self.formas_cortadas)-1, -1, -1):
-            forma = self.formas_cortadas[idx]
-            if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
-                cortes = forma.cortar(self.input_manager.mouse_pos, mouse_vel_vector)
-                self.formas_cortadas.pop(idx)  # Remove a forma cortada da lista
-                self.formas_cortadas.extend(cortes)  # Adiciona as novas formas cortadas
-        """
 
         for idx_lista, forma_list in enumerate([self.formas, self.formas_cortadas]):
             for idx in range(len(forma_list)-1, -1, -1):
@@ -248,8 +293,8 @@ class FaseBase(ABC):
         for idx in range(len(self.fila_formas)-1, -1, -1):
             tempo, tipo = self.fila_formas[idx]
             if tempo < self.input_manager.time:
-                if len(self.formas) > 4:
-                    self.agendar_forma(tipo, 2)
+                if len(self.formas) >= 4:
+                    self.agendar_forma(tipo, random.uniform(1, 4))
                 else:
                     self.formas.append(self.criar_forma(tipo))
                 self.fila_formas.pop(idx)
@@ -295,15 +340,15 @@ class Fase00(FaseBase):
         cor_contador = pygame.Color("black")
 
         qtd_iniciais = {
-            "Círculo": 1,
-            "Quadrado": 3,
-            "Triângulo Equilátero": 2,
-            "Retângulo": 1,
-            "Estrela": 2,
-            "Ângulo": 1
+            TipoForma.CIRCULO: 1,
+            TipoForma.QUADRADO: 3,
+            TipoForma.TRIANGULO_EQUILATERO: 2,
+            TipoForma.RETANGULO: 1,
+            TipoForma.ESTRELA: 2,
+            TipoForma.ANGULO: 1
         }
 
-        alvo = ["Círculo", "Quadrado", "Triângulo Equilátero", "Retângulo", "Estrela", "Ângulo"]
+        alvo = list(qtd_iniciais.keys())
 
         CoresFormas = [
             pygame.Color("darkolivegreen3"),
@@ -330,12 +375,12 @@ class Fase01(FaseBase):
         cor_contador = pygame.Color("black")
 
         qtd_iniciais = {
-            "Triângulo Equilátero": 1,
-            "Triângulo Isóceles" : 2,
-            "Triângulo Retângulo" : 2,
+            TipoForma.TRIANGULO_EQUILATERO: 1,
+            TipoForma.TRIANGULO_ISOCELES: 2,
+            TipoForma.TRIANGULO_RETANGULO: 2,
         }
 
-        alvo = ["Triângulo Equilátero"]
+        alvo = [TipoForma.TRIANGULO_EQUILATERO]
 
         CoresFormas = [
             pygame.Color("darkolivegreen3"),
@@ -363,10 +408,10 @@ class Fase00_(FaseBase):
         cor_contador = pygame.Color("black")
 
         qtd_iniciais = {
-            "Círculo": 1,
+            TipoForma.CIRCULO: 1,
         }
 
-        alvo = ["Círculo"]
+        alvo = [TipoForma.CIRCULO]
 
         CoresFormas = [
             pygame.Color("darkolivegreen3"),

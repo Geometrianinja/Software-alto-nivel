@@ -33,13 +33,14 @@ class ConfigControle():
         self.calib_pairs = []
         
         self.color = pygame.Color("white")
+        self.trying_to_connect = False
         self.connected = False
         self.calibrated = False
-        self.font = pygame.font.Font("PressStart2P.ttf", 24)
+        self.font = pygame.font.Font("PressStart2P.ttf", 18)
         self.gera_imagens()
 
-        self.input_manager = input_manager
-        
+        self.input_manager: entrada.InputManager = input_manager
+
     def gera_imagens(self):
         """Gera e posiciona os elementos visuais iniciais da tela.
     
@@ -52,12 +53,12 @@ class ConfigControle():
         self.rect["Background"] = self.surf["Background"].get_rect(topleft=(0, 0))
         
         
-        mensagem1 = "Aguardando controle..."
+        mensagem1 = "Pressione qualquer botão do mouse para usar o mouse"
         texto1 = self.font.render(mensagem1, True, (255, 255, 255))
         self.surf["Mensagem1"] = texto1
         self.rect["Mensagem1"] = texto1.get_rect(center=(config.LARGURA // 2, config.ALTURA - 120))
     
-        mensagem2 = "Pressione ENTER para usar o mouse"
+        mensagem2 = "Pressione ENTER para tentar conectar controle"
         texto2 = self.font.render(mensagem2, True, (255, 255, 255))
         self.surf["Mensagem2"] = texto2
         self.rect["Mensagem2"] = texto2.get_rect(center=(config.LARGURA // 2, config.ALTURA - 90))
@@ -107,11 +108,6 @@ class ConfigControle():
                 self.connected = True
                 self.new_image()    #Isso aqui é para gerar a tela com os dois circulos :D
                 return self.estado_name
-            elif(self.input_manager.Key_enter_pressed):
-                self.connected = True
-                #self.new_image()           #Temporario para poder testar com o mouse as coisas
-                #return self.estado_name
-                return self.next_state
             print("Trying to connect...")
             time.sleep(0.05)
             return self.estado_name
@@ -125,7 +121,14 @@ class ConfigControle():
         Returns:
             str: Nome do próximo estado do jogo. Pode ser o próprio estado ou o "MENU".
         """
-        if(not self.connected):
+        if not self.trying_to_connect:
+            if(self.input_manager.mouse_left_just_pressed or self.input_manager.mouse_right_just_pressed):
+                self.connected = True
+                return self.next_state
+            if(self.input_manager.Key_enter_pressed):
+                self.trying_to_connect = True
+
+        if(not self.connected and self.trying_to_connect):
             return self.try_connect()
         elif self.calibrated:
             return self.next_state
