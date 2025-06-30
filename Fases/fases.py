@@ -255,11 +255,13 @@ class FaseBase(ABC):
                     self.cortes_totais += 1
                 self.contador_cortes[forma.tipo] += 1
                 if forma.tipo not in self.alvo:
-                    print(forma.tipo)
                     self.cortes_totais -= 2
                     if self.cortes_totais < 0:
                         self.cortes_totais = 0
-                    self.erros += 1
+                    if self.cortes_totais > 0:
+                        self.erros = 0
+                    else:
+                        self.erros += 1
 
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
                 self.formas_cortadas.extend(cortes)  # Adiciona as formas cortadas à lista de cortadas
@@ -287,6 +289,7 @@ class FaseBase(ABC):
         Returns:
             str: Nome do próximo estado do jogo (ou o estado atual se continuar).
         """
+        print(self.formas_cortadas)
         if self.get_qtd_formas() == 0:
             self.agendar_geracao_inicial()
 

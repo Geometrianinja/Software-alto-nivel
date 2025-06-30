@@ -58,6 +58,9 @@ class SlideShowBase:
                 self.reset()
                 return self.proximo_estado
 
+        if self.input_manager.cont_back_just_pressed:
+            self.reset()
+            return "MENU"
         return self.estado_name
     
     def quebrar_texto(self):
