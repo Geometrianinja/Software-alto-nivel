@@ -37,7 +37,12 @@ class Gerenciador:
             "TUTORIAL1": introsetutoriais.Tutorial1(input_manager),
             "FASE01" : fases.Fase01(self.input_manager),
             "POSFASE01": introsetutoriais.PosFase01(self.input_manager),
-
+            "FASE02" : fases.Fase02(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE03" : fases.Fase03(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE04" : fases.Fase04(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE05" : fases.Fase05(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE06" : fases.Fase06(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE07" : fases.Fase07(config.LARGURA, config.ALTURA, self.input_manager),
             }
         
         self.estado_atual = self.estados["CONTROL"]  # Estado inicial

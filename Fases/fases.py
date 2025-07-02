@@ -110,6 +110,7 @@ class FaseBase(ABC):
         self.cortes_totais = 0                                              # Número total de formas cortadas (acertos)
         self.erros = 0                                                      # Número de erros cometidos (formas cortadas erradas)
         self.completou = False                                              # Indica se o objetivo da fase foi alcançado
+        self.paused = False                                                 # Indica se o jogo foi pausado
 
         for forma in self.contador_cortes.keys():
             self.contador_cortes[forma] = 0
@@ -242,6 +243,17 @@ class FaseBase(ABC):
             else:
                 self.vidas_mortas[i].desenhar(tela)
 
+        if self.paused:
+            overlay = pygame.Surface(tela.get_size(), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))  # Preto com transparência
+            tela.blit(overlay, (0, 0))
+
+            # Escrever o texto "Jogo Pausado"
+            fonte = pygame.font.Font("PressStart2P.ttf", 30)
+            texto = fonte.render("JOGO PAUSADO", True, (255, 255, 255))
+            texto_rect = texto.get_rect(center=tela.get_rect().center)
+            tela.blit(texto, texto_rect)
+
     def atualizar_formas(self):
         """
         Atualiza o estado das formas na tela, processando interações do jogador e removendo formas antigas.
@@ -254,11 +266,13 @@ class FaseBase(ABC):
                     self.cortes_totais += 1
                 self.contador_cortes[forma.tipo] += 1
                 if forma.tipo not in self.alvo:
-                    print(forma.tipo)
                     self.cortes_totais -= 2
                     if self.cortes_totais < 0:
                         self.cortes_totais = 0
-                    self.erros += 1
+                    if self.cortes_totais > 0:
+                        self.erros = 0
+                    else:
+                        self.erros += 1
 
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
                 self.formas_cortadas.extend(cortes)  # Adiciona as formas cortadas à lista de cortadas
@@ -286,6 +300,15 @@ class FaseBase(ABC):
         Returns:
             str: Nome do próximo estado do jogo (ou o estado atual se continuar).
         """
+
+        if (self.input_manager.mouse_right_just_pressed or self.input_manager.cont_back_just_pressed) and not self.paused:
+            self.paused = True
+        elif (self.input_manager.mouse_right_just_pressed or self.input_manager.cont_back_just_pressed) and self.paused:
+            self.paused = False
+
+        if self.paused:
+            return self.state_name
+
         if self.get_qtd_formas() == 0:
             self.agendar_geracao_inicial()
 
@@ -426,3 +449,59 @@ class Fase00_(FaseBase):
             alvo, input_manager, max_cortes = 1, max_erros = 3,
             background_path=background, next_state= "TUTORIAL0_"
         )
+
+
+class Fase02(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE02"
+        self.restart_state = "FASES"
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
+
+class Fase03(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE03"
+        self.restart_state = "FASES"
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
+
+class Fase04(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE04"
+        self.restart_state = "FASES"
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
+
+class Fase05(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE05"
+        self.restart_state = "FASES"
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
+
+class Fase06(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE06"
+        self.restart_state = "FASES"
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
+
+class Fase07(FaseBase):
+    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+        self.state_name = "FASE07"
+        self.restart_state = "FASES"
+
+    def atualizar(self):
+        return self.restart_state
+    def desenhar(self, tela):
+        pass
