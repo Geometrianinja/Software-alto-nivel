@@ -3,11 +3,12 @@ import config
 from formas import *
 
 class SlideShowBase:
-    def __init__(self, estado_name, imagens, proximo_estado, input_manager, legendas, x, y, largura_maxima, formas):
+    def __init__(self, estado_name, imagens, proximo_estado, estado_anterior, input_manager, legendas, x, y, largura_maxima, formas):
         self.estado_name = estado_name
         self.imagens = [pygame.image.load(img).convert_alpha() for img in imagens]
         self.index = 0
         self.proximo_estado = proximo_estado
+        self.estado_anterior = estado_anterior
         self.input_manager = input_manager
 
         self.pos_x = x
@@ -34,6 +35,11 @@ class SlideShowBase:
         self.tempo_ultima_letra = 0     
 
     def atualizar(self):
+
+        if (self.input_manager.mouse_right_just_pressed or self.input_manager.cont_back_just_pressed):
+            self.reset()
+            return self.estado_anterior
+                
         tempo = pygame.time.get_ticks()
         legenda_atual = self.legendas[self.index] if self.index < len(self.legendas) else ""
 
@@ -107,7 +113,7 @@ class Intro0(SlideShowBase):
         pos_y = 40
         largura_max = 400  
         formas = [[] for _ in range(2)]
-        super().__init__("INTRO0", imagens, "TUTORIAL0", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("INTRO0", imagens, "TUTORIAL0", "FASES",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial0(SlideShowBase):
     def __init__(self, input_manager):
@@ -139,7 +145,7 @@ class Tutorial0(SlideShowBase):
         formas[5] = [circulo_vermelho1]
 
 
-        super().__init__("TUTORIAL0", imagens,  "FASE00_" , input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("TUTORIAL0", imagens,  "FASE00_", "INTRO0" , input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial0_(SlideShowBase):
     def __init__(self, input_manager):
@@ -154,7 +160,7 @@ class Tutorial0_(SlideShowBase):
 
         formas = [[] for _ in range(2)]
  
-        super().__init__("TUTORIAL0_", imagens, "FASE00", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("TUTORIAL0_", imagens, "FASE00", "TUTORIAL0",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class PosFase00(SlideShowBase):
     def __init__(self, input_manager):
@@ -164,7 +170,7 @@ class PosFase00(SlideShowBase):
         pos_y = 100
         largura_max = 380 
         formas = [[] for _ in range(5)]
-        super().__init__("POSFASE00", imagens, "FASES", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("POSFASE00", imagens, "FASES", "TUTORIAL0_",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Intro1(SlideShowBase):
     def __init__(self, input_manager):
@@ -176,7 +182,7 @@ class Intro1(SlideShowBase):
         pos_y = 60
         largura_max = 400  
         formas = [[] for _ in range(4)]
-        super().__init__("INTRO1", imagens, "TUTORIAL1", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("INTRO1", imagens, "TUTORIAL1", "FASES",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class Tutorial1(SlideShowBase):
     def __init__(self, input_manager):
@@ -202,7 +208,7 @@ class Tutorial1(SlideShowBase):
         formas[2] = [triIso]
         formas[3] = [triEsca]
  
-        super().__init__("TUTORIAL1", imagens, "FASE01", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("TUTORIAL1", imagens, "FASE01", "INTRO1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class PosFase01(SlideShowBase):
     def __init__(self, input_manager):
@@ -212,4 +218,4 @@ class PosFase01(SlideShowBase):
         pos_y = 80
         largura_max = 430 
         formas = [[] for _ in range(7)]
-        super().__init__("POSFASE01", imagens, "FASES", input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("POSFASE01", imagens, "FASES", "TUTORIAL1",input_manager, legendas, pos_x, pos_y, largura_max, formas)

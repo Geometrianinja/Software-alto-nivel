@@ -88,11 +88,18 @@ class MenuPrincipal(MenuBase):
     Exibe as opções iniciais como 'Jogar' e 'Configuração', e lida com a entrada
     do jogador para selecionar uma dessas opções.
     """
-    def __init__(self, input_manager):
+    """def __init__(self, input_manager):
         opcoes = [["Jogar", "FASES"], ["Configuracao", "CONFIG"]]
         botoes_posicoes = [
             (config.LARGURA / 2, config.ALTURA / 2 - 50),
             (config.LARGURA / 2, config.ALTURA / 2 + 50),
+        ]
+        background = join('images', 'FlorestaInicio.png')
+        super().__init__("MENU", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=200, botao_altura=80)"""
+    def __init__(self, input_manager):
+        opcoes = [["Jogar", "FASES"]]
+        botoes_posicoes = [
+            (config.LARGURA / 2, config.ALTURA / 2 - 50),
         ]
         background = join('images', 'FlorestaInicio.png')
         super().__init__("MENU", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=200, botao_altura=80)
