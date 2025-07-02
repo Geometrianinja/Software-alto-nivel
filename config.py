@@ -1,5 +1,5 @@
 # ======================= Configurações Globais =======================
-LARGURA, ALTURA = 1000, 500
+#LARGURA, ALTURA = 1000, 500
 FPS = 60
 CORES = {
     "rosa": (255, 105, 180),

@@ -31,6 +31,7 @@ class ConfigControle():
         self.surf = {}
         self.rect = {}
         self.calib_pairs = []
+        self.altura, self.largura = pygame.display.get_window_size()  # Obtém as dimensões da tela
         
         self.color = pygame.Color("white")
         self.trying_to_connect = False
@@ -48,7 +49,7 @@ class ConfigControle():
         informando o status de conexão do controle.
         """
         imagem = pygame.image.load(self.background_path).convert_alpha()
-        imagem = pygame.transform.scale(imagem, (config.LARGURA, config.ALTURA))
+        imagem = pygame.transform.scale(imagem, (self.largura, self.altura))
         self.surf["Background"] = imagem
         self.rect["Background"] = self.surf["Background"].get_rect(topleft=(0, 0))
         
@@ -56,13 +57,13 @@ class ConfigControle():
         mensagem1 = "Pressione qualquer botão do mouse para usar o mouse"
         texto1 = self.font.render(mensagem1, True, (255, 255, 255))
         self.surf["Mensagem1"] = texto1
-        self.rect["Mensagem1"] = texto1.get_rect(center=(config.LARGURA // 2, config.ALTURA - 120))
-    
+        self.rect["Mensagem1"] = texto1.get_rect(center=(self.largura // 2, self.altura - 120))
+
         mensagem2 = "Pressione ENTER para tentar conectar controle"
         texto2 = self.font.render(mensagem2, True, (255, 255, 255))
         self.surf["Mensagem2"] = texto2
-        self.rect["Mensagem2"] = texto2.get_rect(center=(config.LARGURA // 2, config.ALTURA - 90))
-        
+        self.rect["Mensagem2"] = texto2.get_rect(center=(self.largura // 2, self.altura - 90))
+
     def new_image(self):
         """Atualiza a interface após a conexão do controle.
     
@@ -75,16 +76,14 @@ class ConfigControle():
         mensagem1 = "Mire nos alvos"
         texto1 = self.font.render(mensagem1, True, self.color)
         self.surf["Mensagem3"] = texto1
-        self.rect["Mensagem3"] = texto1.get_rect(center=(config.LARGURA // 2, config.ALTURA - 150))
+        self.rect["Mensagem3"] = texto1.get_rect(center=(self.largura // 2, self.altura - 150))
         self.opcoes.append(["Mensagem3", "Mensagem3"])
-        
-        self.target1 = formas.Circulo(config.LARGURA, config.ALTURA, self.color,
-                                       x_inicial=config.LARGURA - 100, y=config.ALTURA - 100, velocidade=0)
+
+        self.target1 = formas.Circulo(self.largura, (255, 255, 255), 0)
         self.surf["Circle01"] = self.target1
         self.opcoes.append(["Circle01", "Circle01"])
-        
-        self.target2 = formas.Circulo(config.LARGURA, config.ALTURA, self.color,
-                                       x_inicial=100, y=100, velocidade=0)
+
+        self.target2 = formas.Circulo(self.largura, (255, 255, 255), 0)
         self.surf["Circle02"] = self.target2
         self.opcoes.append(["Circle02", "Circle02"])
         
@@ -135,10 +134,10 @@ class ConfigControle():
         elif self.input_manager.cont_select_just_pressed:
             if len(self.calib_pairs) == 0:
                 self.calib_pairs.append((self.input_manager.gyro[0], self.input_manager.gyro[1]))
-                self.calib_pairs.append((self.target2.x, self.target2.y))
+                self.calib_pairs.append((self.target2.posicao.x, self.target2.posicao.y))
             else:
                 self.calib_pairs.append((self.input_manager.gyro[0], self.input_manager.gyro[1]))
-                self.calib_pairs.append((self.target1.x, self.target1.y))
+                self.calib_pairs.append((self.target1.posicao.x, self.target1.posicao.y))
                 print(self.calib_pairs)
                 self.input_manager.set_calibration_data(self.calib_pairs[0], self.calib_pairs[1], 
                                                    self.calib_pairs[2], self.calib_pairs[3])

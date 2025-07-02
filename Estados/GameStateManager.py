@@ -27,15 +27,15 @@ class Gerenciador:
             "INTRO0": introsetutoriais.Intro0(input_manager),
             "TUTORIAL0": introsetutoriais.Tutorial0(input_manager),
             "TUTORIAL0_": introsetutoriais.Tutorial0_(input_manager),
-            "FASE00_" : fases.Fase00_(config.LARGURA, config.ALTURA, self.input_manager),
-            "FASE00" : fases.Fase00(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE00_" : fases.Fase00_( self.input_manager),
+            "FASE00" : fases.Fase00(self.input_manager),
             "POSFASE00": introsetutoriais.PosFase00(self.input_manager),  
             "MENU"   : menu.MenuPrincipal(self.input_manager), 
             "CONFIG" : menu_config.Configuracao(),
             "FASES"  : menu.Fases(self.input_manager),
             "INTRO1": introsetutoriais.Intro1(input_manager),
             "TUTORIAL1": introsetutoriais.Tutorial1(input_manager),
-            "FASE01" : fases.Fase01(config.LARGURA, config.ALTURA, self.input_manager),
+            "FASE01" : fases.Fase01(self.input_manager),
             "POSFASE01": introsetutoriais.PosFase01(self.input_manager),
 
             }

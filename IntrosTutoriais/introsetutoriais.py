@@ -116,18 +116,19 @@ class Tutorial0(SlideShowBase):
         pos_y = 90
         largura_max = 740  
 
+        largura, altura = pygame.display.get_window_size()
         circulo_branco = Circulo(15, pygame.Color("white"), 0)
-        circulo_branco.posicao = Vector2(config.LARGURA // 2 - 30, config.ALTURA // 2 - 150)
+        circulo_branco.posicao = Vector2(largura // 2 - 30, altura // 2 - 150)
         circulo_branco.velocidade = Vector2(0, 0)
         circulo_branco.velocidade_rotacao = (0)
 
         circulo_vermelho = Circulo(15, pygame.Color("red"), 0)
-        circulo_vermelho.posicao = Vector2(config.LARGURA // 2 + 5, config.ALTURA // 2 - 150)
+        circulo_vermelho.posicao = Vector2(largura // 2 + 5, altura // 2 - 150)
         circulo_vermelho.velocidade = Vector2(0, 0)
         circulo_vermelho.velocidade_rotacao = (0)
 
         circulo_vermelho1 = Circulo(15, pygame.Color("red"), 0)
-        circulo_vermelho1.posicao = Vector2(config.LARGURA // 2 + 210, config.ALTURA // 2 - 150)
+        circulo_vermelho1.posicao = Vector2(largura // 2 + 210, altura // 2 - 150)
         circulo_vermelho1.velocidade = Vector2(0, 0)
         circulo_vermelho1.velocidade_rotacao = (0)
         formas = [[] for _ in range(6)]
@@ -184,15 +185,16 @@ class Tutorial1(SlideShowBase):
         pos_x = 250
         pos_y = 80
         largura_max = 600 
+        largura, altura = pygame.display.get_window_size()
 
         triEqui = TrianguloEquilatero(70, pygame.Color("black"), 0)
-        triEqui.posicao= Vector2(config.LARGURA // 2 , config.ALTURA // 2-20 )
+        triEqui.posicao= Vector2(largura // 2 , altura // 2-20 )
 
         triIso = TrianguloIsoceles(100,40, pygame.Color("black"), 0)
-        triIso.posicao = Vector2(config.LARGURA // 2 , config.ALTURA // 2  - 40)
+        triIso.posicao = Vector2(largura // 2 , altura // 2  - 40)
 
         triEsca = TrianguloRetangulo(60,80, pygame.Color("black"), 0)
-        triEsca.posicao = Vector2(config.LARGURA // 2 , config.ALTURA // 2 - 30 )
+        triEsca.posicao = Vector2(largura // 2 , altura // 2 - 30)
 
         formas = [[] for _ in range(6)]
         formas[1] = [triEqui]

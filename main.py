@@ -14,7 +14,7 @@ class Jogo:
     def __init__(self):
         pygame.init()
         pygame.mouse.set_visible(False)
-        self.tela = pygame.display.set_mode((config.LARGURA, config.ALTURA))
+        self.tela = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.NOFRAME)
         pygame.display.set_caption("Shaolin Shapes")
         self.clock = pygame.time.Clock()
         self.jogando = True
@@ -31,8 +31,9 @@ class Jogo:
             self.manager.desenhar(self.tela)
             self.cursor.draw()
 
-            pygame.display.flip()
             self.clock.tick(config.FPS)
+
+            pygame.display.flip()
 
         pygame.quit()
     

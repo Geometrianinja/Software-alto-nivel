@@ -91,8 +91,7 @@ class FaseBase(ABC):
         self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20), (70, 70, 70), largura=14)  # Fileira de vidas mortas (mini formas)
 
         # === Dimensões da Tela ===
-        self.largura = config.LARGURA                                       # Largura da tela
-        self.altura = config.ALTURA                                         # Altura da tela
+        self.largura, self.altura = pygame.display.get_window_size()        # dimensões da tela do jogo
 
         # === Controle de Formas ===
         self.formas: list[formas.Forma] = []                                # Formas atualmente na tela
@@ -331,7 +330,7 @@ class FaseBase(ABC):
 
 
 class Fase00(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         state_name = "FASE00"
         restart_state = "INTRO0"
         titulo = "Tutorial"
@@ -366,7 +365,7 @@ class Fase00(FaseBase):
         )
 
 class Fase01(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         state_name = "FASE01"
         restart_state = "TUTORIAL1"
         titulo = " "
@@ -399,7 +398,7 @@ class Fase01(FaseBase):
 
 
 class Fase00_(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         state_name = "FASE00_"
         restart_state = "TUTORIAL0"
         titulo = "Tutorial"
