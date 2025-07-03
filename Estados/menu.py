@@ -27,8 +27,7 @@ class MenuBase():
         if self.background_path:
             # Carrega e redimensiona a imagem para o tamanho da tela
             imagem = pygame.image.load(self.background_path).convert_alpha()
-            largura, altura = pygame.display.get_window_size()
-            imagem = pygame.transform.scale(imagem, (largura, altura))
+            imagem = pygame.transform.scale(imagem, (config.LARGURA, config.ALTURA))
             self.surf["Background"] = imagem
             self.rect["Background"] = self.surf["Background"].get_rect(topleft=(0, 0))
 
@@ -46,7 +45,7 @@ class MenuBase():
                 novo_tamanho = (self.botao_largura, self.botao_altura)
                 self.surf[nome] = pygame.transform.smoothscale(imagem_original, novo_tamanho)
             else:
-                cor = config.CORES["branco"]
+                cor = config.Cores.BRANCO
                 self.surf[nome] = self.font.render(nome, True, cor)
                 
             x, y = self.botoes_posicoes[i]
@@ -91,10 +90,9 @@ class MenuPrincipal(MenuBase):
     """
     """def __init__(self, input_manager):
         opcoes = [["Jogar", "FASES"], ["Configuracao", "CONFIG"]]
-        largura, altura = pygame.display.get_window_size()
         botoes_posicoes = [
-            (largura / 2, altura / 2 - 50),
-            (largura / 2, altura / 2 + 50),
+            (config.LARGURA / 2, config.ALTURA / 2 - 50),
+            (config.LARGURA / 2, config.ALTURA / 2 + 50),
         ]
         background = join('images', 'FlorestaInicio.png')
         super().__init__("MENU", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=200, botao_altura=80)"""
@@ -134,5 +132,6 @@ class Fases(MenuBase):
             (620, 34),
             (790, 479),
         ]
+        botoes_posicoes = [(x * config.LARGURA / 1000, y * config.ALTURA / 500) for x, y in botoes_posicoes]
         background = join('images', 'MenuSemfases.png')
         super().__init__("FASES", opcoes, input_manager, background, botoes_posicoes=botoes_posicoes, botao_largura=120, botao_altura=48)

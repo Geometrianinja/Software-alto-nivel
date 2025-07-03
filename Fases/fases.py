@@ -87,18 +87,18 @@ class FaseBase(ABC):
         self.font = pygame.font.Font("PressStart2P.ttf", 24)                # Fonte do título
         self.fonte_contador = pygame.font.Font("PressStart2P.ttf", 20)      # Fonte do contador
 
-        self.vidas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20), (255, 255, 255), largura=14)  # Fileira de vidas (mini formas)
-        self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20), (70, 70, 70), largura=14)  # Fileira de vidas mortas (mini formas)
+        self.vidas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (255, 255, 255), largura=14*config.UN)  # Fileira de vidas (mini formas)
+        self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (70, 70, 70), largura=14*config.UN)  # Fileira de vidas mortas (mini formas)
 
         # === Dimensões da Tela ===
-        self.largura, self.altura = pygame.display.get_window_size()        # dimensões da tela do jogo
+        self.largura, self.altura = config.LARGURA, config.ALTURA        # dimensões da tela do jogo
 
         # === Controle de Formas ===
         self.formas: list[formas.Forma] = []                                # Formas atualmente na tela
         self.fila_formas: list[tuple[float, TipoForma]] = []             # Formas agendadas para aparecer com delay
         self.formas_cortadas: list[formas.Forma] = []                       # Formas que foram cortadas
         self.limite_max_formas = 6                                          # Máximo de formas simultâneas na tela
-        self.gravidade = 150                                                # Gravidade aplicada às formas
+        self.gravidade = 150*config.UN                                            # Gravidade aplicada às formas
 
         # === Controle de Tempo e Delay ===
         self.tempo_excluir: float = 0.5                                     # Tempo (em segundos) até excluir uma forma após acerto
@@ -166,27 +166,27 @@ class FaseBase(ABC):
         Raises:
             ValueError: Se o tipo informado não for reconhecido.
         """
-        velocidade = Vector2(random.uniform(-150, 150), random.uniform(-400, -250))
-        posicao = Vector2(self.largura // 2 - velocidade.x*3, self.altura + 60)
+        velocidade = Vector2(random.uniform(-150*config.UN, 150*config.UN), random.uniform(-400*config.UN, -250*config.UN))
+        posicao = Vector2(self.largura // 2 - velocidade.x*3, self.altura + 60*config.UN)
         vel_rotacao = random.uniform(-180, 180)
 
         cor = random.choice(self.CoresFormas)
         if tipo == TipoForma.CIRCULO:
-            forma = Circulo(50, cor, self.gravidade)
+            forma = Circulo(50*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.RETANGULO:
-            forma = Retangulo(110, 70, cor, self.gravidade)
+            forma = Retangulo(110*config.UN, 70*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.QUADRADO:
-            forma = Quadrado(100, cor, self.gravidade)
+            forma = Quadrado(100*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.TRIANGULO_EQUILATERO:
-            forma = TrianguloEquilatero(120, cor, self.gravidade)
+            forma = TrianguloEquilatero(120*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.TRIANGULO_ISOCELES:
-            forma = TrianguloIsoceles(100, 40, cor, self.gravidade)
+            forma = TrianguloIsoceles(100*config.UN, 40*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.TRIANGULO_RETANGULO:
-            forma = TrianguloRetangulo(90, 120, cor, self.gravidade)
+            forma = TrianguloRetangulo(90*config.UN, 120*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.ESTRELA:
-            forma = Estrela(80, cor, self.gravidade)
+            forma = Estrela(80*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.ANGULO:
-            forma = Angulo(70, 30, random.uniform(30, 180), cor, self.gravidade)
+            forma = Angulo(70*config.UN, 30*config.UN, random.uniform(30, 180), cor, self.gravidade)
         else:
             raise ValueError(f"Tipo de forma desconhecido: {tipo}")
         
@@ -450,9 +450,8 @@ class Fase00_(FaseBase):
             background_path=background, next_state= "TUTORIAL0_"
         )
 
-
 class Fase02(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE02"
         self.restart_state = "FASES"
     def atualizar(self):
@@ -461,7 +460,7 @@ class Fase02(FaseBase):
         pass
 
 class Fase03(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE03"
         self.restart_state = "FASES"
     def atualizar(self):
@@ -470,7 +469,7 @@ class Fase03(FaseBase):
         pass
 
 class Fase04(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE04"
         self.restart_state = "FASES"
     def atualizar(self):
@@ -479,7 +478,7 @@ class Fase04(FaseBase):
         pass
 
 class Fase05(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE05"
         self.restart_state = "FASES"
     def atualizar(self):
@@ -488,7 +487,7 @@ class Fase05(FaseBase):
         pass
 
 class Fase06(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE06"
         self.restart_state = "FASES"
     def atualizar(self):
@@ -497,7 +496,7 @@ class Fase06(FaseBase):
         pass
 
 class Fase07(FaseBase):
-    def __init__(self, largura, altura, input_manager: entrada.InputManager):
+    def __init__(self, input_manager: entrada.InputManager):
         self.state_name = "FASE07"
         self.restart_state = "FASES"
 

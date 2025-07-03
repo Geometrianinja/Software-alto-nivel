@@ -31,8 +31,8 @@ class ConfigControle():
         self.surf = {}
         self.rect = {}
         self.calib_pairs = []
-        self.altura, self.largura = pygame.display.get_window_size()  # Obtém as dimensões da tela
-        
+        self.largura, self.altura = config.LARGURA, config.ALTURA  # Obtém as dimensões da tela
+
         self.color = pygame.Color("white")
         self.trying_to_connect = False
         self.connected = False

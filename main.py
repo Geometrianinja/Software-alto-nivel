@@ -14,13 +14,19 @@ class Jogo:
     def __init__(self):
         pygame.init()
         pygame.mouse.set_visible(False)
-        self.tela = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.NOFRAME)
+
+        if config.LARGURA == 0 or config.ALTURA == 0:
+            self.tela = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.NOFRAME)
+            config.LARGURA, config.ALTURA = self.tela.get_size()
+        else:
+            self.tela = pygame.display.set_mode((config.LARGURA, config.ALTURA))
+        config.UN = config.LARGURA / 1000
         pygame.display.set_caption("Shaolin Shapes")
         self.clock = pygame.time.Clock()
         self.jogando = True
         self.input_manager = InputManager()
         self.manager = GSM.Gerenciador(self.input_manager)
-        self.cursor = Cursor(14, self.input_manager, [(255, 255, 255), (255,100, 100)], self.tela )
+        self.cursor = Cursor(14, self.input_manager, [(255, 255, 255), (255, 100, 100)], self.tela)
 
     def rodar(self):
         while self.jogando:

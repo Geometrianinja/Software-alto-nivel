@@ -14,7 +14,7 @@ class SlideShowBase:
         self.pos_x = x
         self.pos_y = y
         self.largura_maxima = largura_maxima
-        self.fonte = pygame.font.Font("PressStart2P.ttf", 20) 
+        self.fonte = pygame.font.Font("PressStart2P.ttf", 25) 
         self.texto_mostrado = ""        
         self.texto_index = 0            
         self.tempo_ultima_letra = 0     
@@ -109,9 +109,9 @@ class Intro0(SlideShowBase):
             "images/FASE0intro.png" for _ in range(2)
         ]
         legendas = "IntrosTutoriais/Introducoes/Introducao_0.txt"
-        pos_x = 250
-        pos_y = 40
-        largura_max = 400  
+        pos_x = 250*config.LARGURA //1000
+        pos_y = 50*config.ALTURA //1000
+        largura_max = 400*config.LARGURA //1000
         formas = [[] for _ in range(2)]
         super().__init__("INTRO0", imagens, "TUTORIAL0", "FASES",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
@@ -121,25 +121,19 @@ class Tutorial0(SlideShowBase):
             "images/FASE0tutorial.png" for _ in range(6)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_0.txt"
-        pos_x = 150
-        pos_y = 90
-        largura_max = 740  
+        pos_x = 150*config.LARGURA //1000
+        pos_y = 90*config.ALTURA //1000
+        largura_max = 740*config.LARGURA //1000
 
-        largura, altura = pygame.display.get_window_size()
-        circulo_branco = Circulo(15, pygame.Color("white"), 0)
-        circulo_branco.posicao = Vector2(largura // 2 - 30, altura // 2 - 150)
-        circulo_branco.velocidade = Vector2(0, 0)
-        circulo_branco.velocidade_rotacao = (0)
+        circulo_branco = Circulo(15, config.Cores.BRANCO, 0)
+        circulo_branco.posicao = Vector2(config.LARGURA *(0.5 - 30/1000), config.ALTURA *(0.5 - 150/500))
 
-        circulo_vermelho = Circulo(15, pygame.Color("red"), 0)
-        circulo_vermelho.posicao = Vector2(largura // 2 + 5, altura // 2 - 150)
-        circulo_vermelho.velocidade = Vector2(0, 0)
-        circulo_vermelho.velocidade_rotacao = (0)
+        circulo_vermelho = Circulo(15, config.Cores.VERMELHO, 0)
+        circulo_vermelho.posicao = Vector2(config.LARGURA *(0.5 + 5/1000), config.ALTURA *(0.5 - 150/500))
 
-        circulo_vermelho1 = Circulo(15, pygame.Color("red"), 0)
-        circulo_vermelho1.posicao = Vector2(largura // 2 + 210, altura // 2 - 150)
-        circulo_vermelho1.velocidade = Vector2(0, 0)
-        circulo_vermelho1.velocidade_rotacao = (0)
+        circulo_vermelho1 = Circulo(15, config.Cores.VERMELHO, 0)
+        circulo_vermelho1.posicao = Vector2(config.LARGURA *(0.5 + 210/1000), config.ALTURA *(0.5 - 150/500))
+
         formas = [[] for _ in range(6)]
         formas[1] = [circulo_branco]
         formas[2] = [circulo_vermelho]
@@ -154,10 +148,9 @@ class Tutorial0_(SlideShowBase):
             "images/FASE0tutorial.png" for _ in range(3)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_0_.txt"
-
-        pos_x = 150
-        pos_y = 90
-        largura_max = 740 
+        pos_x = 150*config.LARGURA //1000
+        pos_y = 90*config.ALTURA //1000
+        largura_max = 740*config.LARGURA //1000
 
         formas = [[] for _ in range(2)]
  
@@ -167,9 +160,9 @@ class PosFase00(SlideShowBase):
     def __init__(self, input_manager):
         imagens = ["images/pos1FASE0jogo.png"] + ["images/pos2FASE0jogo.png" for _ in range(4)]
         legendas = "Posfase/Posfase_0.txt"
-        pos_x = 450
-        pos_y = 100
-        largura_max = 380 
+        pos_x = 450*config.LARGURA //1000
+        pos_y = 100*config.ALTURA //1000
+        largura_max = 380*config.LARGURA //1000
         formas = [[] for _ in range(5)]
         super().__init__("POSFASE00", imagens, "FASES", "TUTORIAL0_",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
@@ -179,9 +172,9 @@ class Intro1(SlideShowBase):
             "images/FASE1intro.png" for _ in range(7)
         ]
         legendas = "IntrosTutoriais/Introducoes/Introducao_1.txt"
-        pos_x = 490
-        pos_y = 60
-        largura_max = 400  
+        pos_x = 490*config.LARGURA //1000
+        pos_y = 60*config.ALTURA //1000
+        largura_max = 400*config.LARGURA //1000
         formas = [[] for _ in range(4)]
         super().__init__("INTRO1", imagens, "TUTORIAL1", "FASES",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
@@ -191,19 +184,18 @@ class Tutorial1(SlideShowBase):
             "images/FASE1tutorial.png" for _ in range(5)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_1.txt"
-        pos_x = 250
-        pos_y = 80
-        largura_max = 600 
-        largura, altura = pygame.display.get_window_size()
+        pos_x = 250*config.LARGURA //1000
+        pos_y = 80*config.ALTURA //1000
+        largura_max = 600*config.LARGURA //1000
 
-        triEqui = TrianguloEquilatero(70, pygame.Color("black"), 0)
-        triEqui.posicao= Vector2(largura // 2 , altura // 2-20 )
+        triEqui = TrianguloEquilatero(70, config.Cores.PRETO, 0)
+        triEqui.posicao= Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 -20/500) )
 
-        triIso = TrianguloIsoceles(100,40, pygame.Color("black"), 0)
-        triIso.posicao = Vector2(largura // 2 , altura // 2  - 40)
+        triIso = TrianguloIsoceles(100,40, config.Cores.PRETO, 0)
+        triIso.posicao = Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 - 40/500))
 
-        triEsca = TrianguloRetangulo(60,80, pygame.Color("black"), 0)
-        triEsca.posicao = Vector2(largura // 2 , altura // 2 - 30)
+        triEsca = TrianguloRetangulo(60,80, config.Cores.PRETO, 0)
+        triEsca.posicao = Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 - 30/500))
 
         formas = [[] for _ in range(6)]
         formas[1] = [triEqui]
@@ -216,8 +208,8 @@ class PosFase01(SlideShowBase):
     def __init__(self, input_manager):
         imagens = ["images/pos1FASE1jogo.png"] + ["images/pos2FASE1.png" for _ in range(5)]+["images/pos3FASE1.png"] 
         legendas = "Posfase/Posfase_1.txt"
-        pos_x = 400
-        pos_y = 80
-        largura_max = 430 
+        pos_x = 400*config.LARGURA //1000
+        pos_y = 80*config.ALTURA //1000
+        largura_max = 430*config.LARGURA //1000
         formas = [[] for _ in range(7)]
         super().__init__("POSFASE01", imagens, "FASES", "TUTORIAL1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
