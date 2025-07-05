@@ -14,7 +14,7 @@ class SlideShowBase:
         self.pos_x = x
         self.pos_y = y
         self.largura_maxima = largura_maxima
-        self.fonte = pygame.font.Font("PressStart2P.ttf", 25) 
+        self.fonte = pygame.font.Font("PressStart2P.ttf", 18 * round(config.UN)) 
         self.texto_mostrado = ""        
         self.texto_index = 0            
         self.tempo_ultima_letra = 0     
@@ -95,7 +95,7 @@ class SlideShowBase:
 
             for i, linha in enumerate(linhas):
                 superficie = self.fonte.render(linha, True, (0, 0, 0))  
-                tela.blit(superficie, (self.pos_x, self.pos_y + i * 28))  
+                tela.blit(superficie, (self.pos_x, self.pos_y + i * 28 * config.UN))  
 
         if self.index < len(self.formas):
             for forma in self.formas[self.index]:
@@ -125,14 +125,14 @@ class Tutorial0(SlideShowBase):
         pos_y = 90*config.ALTURA //1000
         largura_max = 740*config.LARGURA //1000
 
-        circulo_branco = Circulo(15, config.Cores.BRANCO, 0)
-        circulo_branco.posicao = Vector2(config.LARGURA *(0.5 - 30/1000), config.ALTURA *(0.5 - 150/500))
+        circulo_branco = Circulo(27, config.Cores.BRANCO, 0)
+        circulo_branco.posicao = Vector2(config.LARGURA * (0.5), config.ALTURA *(0.5 - 198/500))
 
-        circulo_vermelho = Circulo(15, config.Cores.VERMELHO, 0)
-        circulo_vermelho.posicao = Vector2(config.LARGURA *(0.5 + 5/1000), config.ALTURA *(0.5 - 150/500))
+        circulo_vermelho = Circulo(27, config.Cores.VERMELHO, 0)
+        circulo_vermelho.posicao = Vector2(config.LARGURA * (0.5 + 40/1000), config.ALTURA *(0.5 - 198/500))
 
-        circulo_vermelho1 = Circulo(15, config.Cores.VERMELHO, 0)
-        circulo_vermelho1.posicao = Vector2(config.LARGURA *(0.5 + 210/1000), config.ALTURA *(0.5 - 150/500))
+        circulo_vermelho1 = Circulo(27, config.Cores.VERMELHO, 0)
+        circulo_vermelho1.posicao = Vector2(config.LARGURA * (0.5 + 270/1000), config.ALTURA *(0.5 - 198/500))
 
         formas = [[] for _ in range(6)]
         formas[1] = [circulo_branco]
@@ -160,8 +160,8 @@ class PosFase00(SlideShowBase):
     def __init__(self, input_manager):
         imagens = ["images/pos1FASE0jogo.png"] + ["images/pos2FASE0jogo.png" for _ in range(4)]
         legendas = "Posfase/Posfase_0.txt"
-        pos_x = 450*config.LARGURA //1000
-        pos_y = 100*config.ALTURA //1000
+        pos_x = 455*config.LARGURA //1000
+        pos_y = 180*config.ALTURA //1000
         largura_max = 380*config.LARGURA //1000
         formas = [[] for _ in range(5)]
         super().__init__("POSFASE00", imagens, "FASES", "TUTORIAL0_",input_manager, legendas, pos_x, pos_y, largura_max, formas)
@@ -173,7 +173,7 @@ class Intro1(SlideShowBase):
         ]
         legendas = "IntrosTutoriais/Introducoes/Introducao_1.txt"
         pos_x = 490*config.LARGURA //1000
-        pos_y = 60*config.ALTURA //1000
+        pos_y = 90*config.ALTURA //1000
         largura_max = 400*config.LARGURA //1000
         formas = [[] for _ in range(4)]
         super().__init__("INTRO1", imagens, "TUTORIAL1", "FASES",input_manager, legendas, pos_x, pos_y, largura_max, formas)
@@ -184,17 +184,17 @@ class Tutorial1(SlideShowBase):
             "images/FASE1tutorial.png" for _ in range(5)
         ]
         legendas = "IntrosTutoriais/Tutoriais/Tutorial_1.txt"
-        pos_x = 250*config.LARGURA //1000
-        pos_y = 80*config.ALTURA //1000
-        largura_max = 600*config.LARGURA //1000
+        pos_x = 200*config.LARGURA //1000
+        pos_y = 90*config.ALTURA //1000
+        largura_max = 650*config.LARGURA //1000
 
-        triEqui = TrianguloEquilatero(70, config.Cores.PRETO, 0)
+        triEqui = TrianguloEquilatero(130, config.Cores.AMARELO, 0)
         triEqui.posicao= Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 -20/500) )
 
-        triIso = TrianguloIsoceles(100,40, config.Cores.PRETO, 0)
+        triIso = TrianguloIsoceles(140,80, config.Cores.AMARELO, 0)
         triIso.posicao = Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 - 40/500))
 
-        triEsca = TrianguloRetangulo(60,80, config.Cores.PRETO, 0)
+        triEsca = TrianguloRetangulo(105,140, config.Cores.AMARELO, 0)
         triEsca.posicao = Vector2(config.LARGURA *0.5 , config.ALTURA * (0.5 - 30/500))
 
         formas = [[] for _ in range(6)]
@@ -209,7 +209,7 @@ class PosFase01(SlideShowBase):
         imagens = ["images/pos1FASE1jogo.png"] + ["images/pos2FASE1.png" for _ in range(5)]+["images/pos3FASE1.png"] 
         legendas = "Posfase/Posfase_1.txt"
         pos_x = 400*config.LARGURA //1000
-        pos_y = 80*config.ALTURA //1000
+        pos_y = 120*config.ALTURA //1000
         largura_max = 430*config.LARGURA //1000
         formas = [[] for _ in range(7)]
         super().__init__("POSFASE01", imagens, "FASES", "TUTORIAL1",input_manager, legendas, pos_x, pos_y, largura_max, formas)

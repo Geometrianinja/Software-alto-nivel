@@ -1,10 +1,10 @@
 Este bastão possui dois botões sagrados:
 
-O botão branco .. deve ser usado com sabedoria.
-Ele permite que você pause o treinamento ou retorne ao estado anterior.
-Quando precisar refletir ou recuar com honra.
+O botão branco . deve ser usado com sabedoria.
+Ele permite que você pause o treinamento ou retorne ao estado anterior,
+quando precisar refletir ou recuar com honra.
 
-O botão vermelho .. carrega o poder do ataque.
+O botão vermelho . carrega o poder do ataque.
 Com ele, você poderá escolher os desafios e atingir as formas geométricas
 com precisão e coragem.
 
@@ -14,5 +14,5 @@ Vamos testar sua disciplina no controle do bastão.
 Logo à frente, um círculo surgirá no campo de batalha.
 Seu objetivo é simples, mas exige foco:
 
-Pressione o botão vermelho .. e passe o cursor por cima do círculo.
+Pressione o botão vermelho . e passe o cursor por cima do círculo.
 Você pode manter o botão pressionado para facilitar o golpe!
