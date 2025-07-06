@@ -261,7 +261,7 @@ class FaseBase(ABC):
         mouse_vel_vector = Vector2(self.input_manager.mouse_diff)/self.input_manager.dt
         for idx in range(len(self.formas)-1, -1, -1):
             forma = self.formas[idx]
-            if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
+            if (self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff)) or (self.input_manager.button_select_and_pressed and forma.colide_com_segmento(self.input_manager.cont_screen_pos, self.input_manager.controller_screen_pos_diff)):
                 if forma.tipo in self.alvo:
                     self.cortes_totais += 1
                 self.contador_cortes[forma.tipo] += 1

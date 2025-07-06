@@ -141,11 +141,12 @@ class Controller():
                 data = self._bt.read(1).decode('utf-8')
                 
                 if data == 'B':
+                    print('back')
                     event = ButtonEvent(ButtonID.BUTTON_BACK, ButtonEventType.PRESSED)
                 elif data == 'b':
                     event = ButtonEvent(ButtonID.BUTTON_BACK, ButtonEventType.RELEASED)
                 elif data == 'S':
-                    print('setect')
+                    print('select')
                     event = ButtonEvent(ButtonID.BUTTON_SELECT, ButtonEventType.PRESSED)
                 elif data == 's':
                     event = ButtonEvent(ButtonID.BUTTON_SELECT, ButtonEventType.RELEASED)

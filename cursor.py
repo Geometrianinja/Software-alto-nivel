@@ -25,12 +25,16 @@ class Cursor:
             self.trail.pop(0)
 
     def draw(self):
-        if(self.input_manager.mouse_left_pressed or self.input_manager.cont_select_pressed):
+        if(self.input_manager.mouse_left_pressed or self.input_manager.button_select_and_pressed):
             color = self.color[1]
         else:
             color = self.color[0]
 
-        pos = Vector2(*self.input_manager.mouse_pos)
+        if self.input_manager.calibrated and self.input_manager.cont_screen_pos is not None:
+            pos = Vector2(*self.input_manager.cont_screen_pos)
+        else:
+            pos = Vector2(*self.input_manager.mouse_pos)
+            
         dt = self.input_manager.dt
         self.update(pos, dt)
 

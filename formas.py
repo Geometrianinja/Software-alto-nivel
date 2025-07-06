@@ -127,7 +127,7 @@ class Forma(ABC):
         return self
 
 def _baricentro(vertices: Sequence[Vector2]) -> Vector2:
-    """Calcula o baricentro (centroide) de área de um polígono usando a fórmula da área com coordenadas."""
+    """Calcula o baricentro (centroide) de um polígono usando a fórmula da área com coordenadas."""
     if len(vertices) < 3:
         return Vector2(0, 0)
         
@@ -313,11 +313,19 @@ class Poligono(Forma):
             poligono.velocidade_rotacao = self.velocidade_rotacao
             poligono.velocidade = self.velocidade + v*0.1
 
-            if (baricentro - ponto).cross(v_rel) < 0:       # Verifica se o poligono esta do lado direito ou do lado esquerdo do corte
-                poligono.velocidade += v.rotate(90).normalize() * vel_separacao
+            if (baricentro - ponto).cross(v_rel) < 0:  # Verifica se o poligono esta do lado direito ou do lado esquerdo do corte
+                v_rot = v.rotate(90)
+                if v_rot.length() != 0:
+                    poligono.velocidade += v_rot.normalize() * vel_separacao
+                else:
+                    poligono.velocidade += Vector2(vel_separacao, 0)
                 poligono.velocidade_rotacao -= 60
             else:
-                poligono.velocidade += v.rotate(270).normalize() * vel_separacao
+                v_rot = v.rotate(270)
+                if v_rot.length() != 0:
+                    poligono.velocidade += v_rot.normalize() * vel_separacao
+                else:
+                    poligono.velocidade += Vector2(vel_separacao, 0)
                 poligono.velocidade_rotacao += 60
 
             out.append(poligono)
