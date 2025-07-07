@@ -13,7 +13,7 @@ from pygame.math import Vector2
 from math import atan2
 
 
-def criar_mini_forma(tipo: TipoForma, cor, largura=16) -> formas.Forma:
+def criar_mini_forma(tipo: TipoForma, cor, largura=23) -> formas.Forma:
     if tipo == TipoForma.CIRCULO:
         forma = Circulo(largura/2, cor, 0)
     elif tipo == TipoForma.RETANGULO:
@@ -30,6 +30,10 @@ def criar_mini_forma(tipo: TipoForma, cor, largura=16) -> formas.Forma:
         forma = Estrela(largura, cor, 0)
     elif tipo == TipoForma.ANGULO:
         forma = Angulo(largura*0.8, largura*0.3, random.uniform(30, 180), cor, 0)
+    elif tipo == TipoForma.LOSANGO:
+        forma = Losango(largura, 60, cor, 0)
+    elif tipo == TipoForma.PARALELOGRAMO:
+        forma = Paralelogramo(largura, largura*1.3, 50, cor, 0)
     else:
         raise ValueError(f"Tipo de forma desconhecido: {tipo}")
     
@@ -59,26 +63,32 @@ def criar_fileira_mini_formas(tipo: TipoForma, qtd: int, pos: Vector2, cor, larg
 
 class FaseBase(ABC):
     def __init__(
-        self, state_name, restart_state, qtd_inicial: dict[TipoForma, int], 
-        titulo, cor_titulo, cor_contador, CoresFormas,
-        alvo, input_manager, max_cortes=10,
+        self, restart_state, qtd_inicial: dict[TipoForma, int], 
+        titulo, cor_titulo, cor_contador, 
+        alvo, input_manager, CoresFormas: Optional[list[pygame.Color]] = None, max_cortes=10,
         max_erros=0, background_path: Optional[str]=None,
         next_state="FASES"
     ):
         # === Parâmetros da Fase ===
-        self.state_name = state_name                                        # Nome do estado da fase
         self.restart_state = restart_state                                  # Nome do tutorial que a fase deve retornar
         self.next_state = next_state                                        # Estado seguinte após completar a fase
         self.background_path: Optional[str] = background_path               # Caminho da imagem de fundo (opcional)
         self.titulo = titulo                                                # Texto do título exibido na tela
         self.cor_titulo = cor_titulo                                        # Cor do título
         self.cor_contador = cor_contador                                    # Cor do contador
-        self.CoresFormas = CoresFormas                                      # Dicionário de cores das formas
         self.qtd_inicial = qtd_inicial                                      # Quantidade inicial de formas por tipo
         self.contador_cortes = qtd_inicial.copy()                           # Dicionário de cortes realizados por tipo
         self.max_cortes = max_cortes                                        # Número máximo de cortes para passar de nível
         self.max_erros = max_erros                                          # Número máximo de erros permitidos
         self.alvo = alvo                                                    # Lista de tipos de formas que são o "alvo" correto
+        if CoresFormas is None:
+            self.CoresFormas = [pygame.Color("darkolivegreen3"),
+                                pygame.Color("darkorchid1"),
+                                pygame.Color("yellow"),
+                                pygame.Color("steelblue1"),
+                                pygame.Color("orange1")]
+        else:
+            self.CoresFormas = CoresFormas
 
         # === Elementos visuais e gráficos ===
         self.surf = {}                                                      # Superfícies para elementos gráficos (ex: textos, botões)
@@ -87,18 +97,18 @@ class FaseBase(ABC):
         self.font = pygame.font.Font("PressStart2P.ttf", 24)                # Fonte do título
         self.fonte_contador = pygame.font.Font("PressStart2P.ttf", 20)      # Fonte do contador
 
-        self.vidas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (255, 255, 255), largura=14*config.UN)  # Fileira de vidas (mini formas)
-        self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (70, 70, 70), largura=14*config.UN)  # Fileira de vidas mortas (mini formas)
+        self.vidas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (255, 255, 255), largura=23*config.UN)  # Fileira de vidas (mini formas)
+        self.vidas_mortas = criar_fileira_mini_formas(alvo[0], max_cortes, Vector2(20, 20)*config.UN, (70, 70, 70), largura=23*config.UN)  # Fileira de vidas mortas (mini formas)
 
         # === Dimensões da Tela ===
-        self.largura, self.altura = config.LARGURA, config.ALTURA        # dimensões da tela do jogo
+        self.largura, self.altura = config.LARGURA, config.ALTURA           # dimensões da tela do jogo
 
         # === Controle de Formas ===
         self.formas: list[formas.Forma] = []                                # Formas atualmente na tela
-        self.fila_formas: list[tuple[float, TipoForma]] = []             # Formas agendadas para aparecer com delay
+        self.fila_formas: list[tuple[float, TipoForma]] = []                # Formas agendadas para aparecer com delay
         self.formas_cortadas: list[formas.Forma] = []                       # Formas que foram cortadas
         self.limite_max_formas = 6                                          # Máximo de formas simultâneas na tela
-        self.gravidade = 150*config.UN                                            # Gravidade aplicada às formas
+        self.gravidade = 150*config.UN                                      # Gravidade aplicada às formas
 
         # === Controle de Tempo e Delay ===
         self.tempo_excluir: float = 0.5                                     # Tempo (em segundos) até excluir uma forma após acerto
@@ -166,11 +176,13 @@ class FaseBase(ABC):
         Raises:
             ValueError: Se o tipo informado não for reconhecido.
         """
+        print(f"Criando forma do tipo: {tipo}")
         velocidade = Vector2(random.uniform(-150*config.UN, 150*config.UN), random.uniform(-400*config.UN, -250*config.UN))
         posicao = Vector2(self.largura // 2 - velocidade.x*3, self.altura + 60*config.UN)
         vel_rotacao = random.uniform(-180, 180)
 
         cor = random.choice(self.CoresFormas)
+        cor = (cor.r, cor.g, cor.b)
         if tipo == TipoForma.CIRCULO:
             forma = Circulo(50*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.RETANGULO:
@@ -187,6 +199,10 @@ class FaseBase(ABC):
             forma = Estrela(80*config.UN, cor, self.gravidade)
         elif tipo == TipoForma.ANGULO:
             forma = Angulo(70*config.UN, 30*config.UN, random.uniform(30, 180), cor, self.gravidade)
+        elif tipo == TipoForma.LOSANGO:
+            forma = Losango(80*config.UN, 60, cor, self.gravidade)
+        elif tipo == TipoForma.PARALELOGRAMO:
+            forma = Paralelogramo(100*config.UN, 70*config.UN, 60, cor, self.gravidade)
         else:
             raise ValueError(f"Tipo de forma desconhecido: {tipo}")
         
@@ -254,6 +270,25 @@ class FaseBase(ABC):
             texto_rect = texto.get_rect(center=tela.get_rect().center)
             tela.blit(texto, texto_rect)
 
+    def contabilizar_corte(self, forma: formas.Forma):
+        if any(tipo in self.alvo for tipo in forma.tipos):
+            self.cortes_totais += 1
+
+        else:
+            self.cortes_totais -= 2
+            if self.cortes_totais < 0:
+                self.cortes_totais = 0
+            if self.cortes_totais > 0:
+                self.erros = 0
+            else:
+                self.erros += 1
+
+        for tipo in forma.tipos:
+            if tipo in self.contador_cortes:
+                self.contador_cortes[tipo] += 1
+
+
+
     def atualizar_formas(self):
         """
         Atualiza o estado das formas na tela, processando interações do jogador e removendo formas antigas.
@@ -262,23 +297,13 @@ class FaseBase(ABC):
         for idx in range(len(self.formas)-1, -1, -1):
             forma = self.formas[idx]
             if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
-                if forma.tipo in self.alvo:
-                    self.cortes_totais += 1
-                self.contador_cortes[forma.tipo] += 1
-                if forma.tipo not in self.alvo:
-                    self.cortes_totais -= 2
-                    if self.cortes_totais < 0:
-                        self.cortes_totais = 0
-                    if self.cortes_totais > 0:
-                        self.erros = 0
-                    else:
-                        self.erros += 1
+                self.contabilizar_corte(forma)
 
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
                 self.formas_cortadas.extend(cortes)  # Adiciona as formas cortadas à lista de cortadas
                 self.formas.pop(idx)  # Remove a forma cortada da lista
 
-                self.agendar_forma(forma.tipo, self.delay_forma)
+                self.agendar_forma(forma.get_tipo_especifico(), self.delay_forma)
 
         for idx_lista, forma_list in enumerate([self.formas, self.formas_cortadas]):
             for idx in range(len(forma_list)-1, -1, -1):
@@ -288,9 +313,9 @@ class FaseBase(ABC):
                     forma_list.pop(idx)
 
                     if idx_lista == 0:
-                        self.agendar_forma(forma.tipo, self.delay_forma)
+                        self.agendar_forma(forma.get_tipo_especifico(), self.delay_forma)
 
-    def atualizar(self) -> str:
+    def atualizar(self) -> Optional[str]:
         """
         Atualiza o estado da fase atual.
 
@@ -307,7 +332,7 @@ class FaseBase(ABC):
             self.paused = False
 
         if self.paused:
-            return self.state_name
+            return None
 
         if self.get_qtd_formas() == 0:
             self.agendar_geracao_inicial()
@@ -335,7 +360,7 @@ class FaseBase(ABC):
                 self.reset()
                 return self.next_state
         self.gerar_contador()
-        return self.state_name
+        return None
 
     def reset(self):
         """
@@ -351,10 +376,31 @@ class FaseBase(ABC):
         self.gerar_imagens()
         self.agendar_geracao_inicial()
 
+class EntreEtapas:
+    def __init__(self, input_manager, forma: Forma, proximo_estado:str):
+        self.input_manager = input_manager
+        self.forma = forma
+        self.proximo_estado = proximo_estado
+        fonte = pygame.font.Font("PressStart2P.ttf", int(30*config.UN))
+        self.texto = fonte.render("Pressione para continuar", True, config.Cores.PRETO)
+    
+    def atualizar(self):
+        if self.input_manager.mouse_left_just_pressed or self.input_manager.cont_select_just_pressed:
+            return self.proximo_estado
+        if self.input_manager.mouse_right_just_pressed or self.input_manager.cont_back_just_pressed:
+            return "FASES"
+        return None
+        
+    def desenhar(self, tela):
+        tela.fill(config.Cores.BRANCO)
+        self.forma.desenhar(tela)
+        texto_rect = self.texto.get_rect(center=(config.LARGURA // 2, config.ALTURA * 0.9))
+        tela.blit(self.texto, texto_rect)
 
-class Fase00(FaseBase):
+
+# ====================================================== FASE 0 ========================================================
+class Fase00_E0(FaseBase):
     def __init__(self, input_manager: entrada.InputManager):
-        state_name = "FASE00"
         restart_state = "INTRO0"
         titulo = "Tutorial"
         background = join('images', 'FASE0jogo.png')
@@ -367,62 +413,22 @@ class Fase00(FaseBase):
             TipoForma.TRIANGULO_EQUILATERO: 2,
             TipoForma.RETANGULO: 1,
             TipoForma.ESTRELA: 2,
-            TipoForma.ANGULO: 1
+            TipoForma.ANGULO: 1,
+            TipoForma.RETANGULO: 2,
+            TipoForma.QUADRADO: 1
         }
 
         alvo = list(qtd_iniciais.keys())
 
-        CoresFormas = [
-            pygame.Color("darkolivegreen3"),
-            pygame.Color("darkorchid1"),
-            pygame.Color("yellow"),
-            pygame.Color("steelblue1"),
-            pygame.Color("orange1"),
-        ]
-
         super().__init__(
-            state_name, restart_state, qtd_iniciais, titulo, 
-            cor_titulo, cor_contador, CoresFormas,
-            alvo, input_manager, max_cortes = 52, max_erros = 3,
-            background_path=background, next_state= "POSFASE00"
+         restart_state, qtd_iniciais, titulo, 
+            cor_titulo, cor_contador,
+            alvo, input_manager, max_cortes=36, max_erros=3,
+            background_path=background, next_state="POSFASE00"
         )
-
-class Fase01(FaseBase):
-    def __init__(self, input_manager: entrada.InputManager):
-        state_name = "FASE01"
-        restart_state = "TUTORIAL1"
-        titulo = " "
-        background = join('images', 'FASE1jogo.png')
-        cor_titulo = pygame.Color("black")
-        cor_contador = pygame.Color("black")
-
-        qtd_iniciais = {
-            TipoForma.TRIANGULO_EQUILATERO: 1,
-            TipoForma.TRIANGULO_ISOCELES: 2,
-            TipoForma.TRIANGULO_RETANGULO: 2,
-        }
-
-        alvo = [TipoForma.TRIANGULO_EQUILATERO]
-
-        CoresFormas = [
-            pygame.Color("darkolivegreen3"),
-            pygame.Color("darkorchid1"),
-            pygame.Color("yellow"),
-            pygame.Color("steelblue1"),
-            pygame.Color("orange1"),
-        ]
-
-        super().__init__(
-            state_name, restart_state, qtd_iniciais, titulo, 
-            cor_titulo, cor_contador, CoresFormas,
-            alvo, input_manager, max_cortes=10, max_erros=3,
-            background_path=background, next_state="POSFASE01"
-        )
-
 
 class Fase00_(FaseBase):
     def __init__(self, input_manager: entrada.InputManager):
-        state_name = "FASE00_"
         restart_state = "TUTORIAL0"
         titulo = "Tutorial"
         background = join('images', 'FASE0jogo.png')
@@ -435,20 +441,59 @@ class Fase00_(FaseBase):
 
         alvo = [TipoForma.CIRCULO]
 
-        CoresFormas = [
-            pygame.Color("darkolivegreen3"),
-            pygame.Color("darkorchid1"),
-            pygame.Color("yellow"),
-            pygame.Color("steelblue1"),
-            pygame.Color("orange1"),
-        ]
-
         super().__init__(
-            state_name, restart_state, qtd_iniciais, titulo, 
-            cor_titulo, cor_contador, CoresFormas,
-            alvo, input_manager, max_cortes = 1, max_erros = 3,
+            restart_state, qtd_iniciais, titulo,
+            cor_titulo, cor_contador,
+            alvo, input_manager, max_cortes=1, max_erros=3,
             background_path=background, next_state= "TUTORIAL0_"
         )
+
+# ======================================================= FASE 1 ========================================================
+class Fase01(FaseBase):
+    def __init__(self, input_manager: entrada.InputManager, qtd_iniciais: dict[TipoForma, int], alvo: list[TipoForma], next_state, restart_state):
+        titulo = "Fase 1"
+        background = join('images', 'FASE1jogo.png')
+        cor_titulo = pygame.Color("black")
+        cor_contador = pygame.Color("black")
+
+        super().__init__(
+            restart_state, qtd_iniciais, titulo, 
+            cor_titulo, cor_contador, 
+            alvo, input_manager, max_cortes=5, max_erros=3,
+            background_path=background, next_state=next_state
+        )
+
+class Fase01_E0(Fase01):
+    def __init__(self, input_manager: entrada.InputManager):
+        qtd_iniciais = {
+            TipoForma.TRIANGULO_EQUILATERO: 2,
+            TipoForma.TRIANGULO_ISOCELES: 2,
+            TipoForma.TRIANGULO_RETANGULO: 2,
+        }
+
+        alvo = [TipoForma.TRIANGULO_EQUILATERO]
+
+        super().__init__(input_manager, qtd_iniciais, alvo, "ENTREETAPAS01_E0", "TUTORIAL1")
+        
+class EntreEtapas01_E0(EntreEtapas):
+    def __init__(self, input_manager):
+        proximo_estado = "FASE01_E1"
+        forma = TrianguloIsoceles(400*config.UN, 250*config.UN, config.Cores.BRANCO, 0)
+        forma.posicao = Vector2(config.LARGURA // 2, config.ALTURA // 2)
+        forma.rotacao = 180
+        super().__init__(input_manager, forma, proximo_estado)
+
+class Fase01_E1(Fase01):
+    def __init__(self, input_manager: entrada.InputManager):
+        qtd_iniciais = {
+            TipoForma.TRIANGULO_EQUILATERO: 2,
+            TipoForma.TRIANGULO_ISOCELES: 2,
+            TipoForma.TRIANGULO_RETANGULO: 2,
+        }
+
+        alvo = [TipoForma.TRIANGULO_ISOCELES]
+
+        super().__init__(input_manager, qtd_iniciais, alvo, "POSFASE01", "ENTREETAPAS01_E0")
 
 class Fase02(FaseBase):
     def __init__(self, input_manager: entrada.InputManager):
@@ -486,14 +531,86 @@ class Fase05(FaseBase):
     def desenhar(self, tela):
         pass
 
+# ======================================================= FASE 6 ========================================================
 class Fase06(FaseBase):
+    def __init__(self, input_manager: entrada.InputManager, qtd_iniciais: dict[TipoForma, int], alvo: list[TipoForma], next_state, restart_state):
+        titulo = "Fase 6"
+        background = join('images', 'FASE1jogo.png')
+        cor_titulo = pygame.Color("black")
+        cor_contador = pygame.Color("black")
+
+        super().__init__(
+            restart_state, qtd_iniciais, titulo, 
+            cor_titulo, cor_contador, 
+            alvo, input_manager, max_cortes=4, max_erros=3,
+            background_path=background, next_state=next_state
+        )
+
+class EntreEtapas06_E0(EntreEtapas):
     def __init__(self, input_manager: entrada.InputManager):
-        self.state_name = "FASE06"
-        self.restart_state = "FASES"
-    def atualizar(self):
-        return self.restart_state
-    def desenhar(self, tela):
-        pass
+        proximo_estado = "FASE06_E0"
+        forma = Retangulo(400*config.UN, 250*config.UN, config.Cores.BRANCO, 0)
+        forma.posicao = Vector2(config.LARGURA // 2, config.ALTURA // 2)
+        forma.rotacao = 180
+        super().__init__(input_manager, forma, proximo_estado)
+
+class Fase06_E0(Fase06):
+    def __init__(self, input_manager: entrada.InputManager):
+        qtd_iniciais = {
+            TipoForma.LOSANGO: 2,
+            TipoForma.PARALELOGRAMO: 2,
+            TipoForma.QUADRADO: 2,
+            TipoForma.RETANGULO: 2
+        }
+
+        alvo = [TipoForma.RETANGULO]
+
+        super().__init__(input_manager, qtd_iniciais, alvo, "ENTREETAPAS06_E1", "ENTREETAPAS06_E0")
+
+class EntreEtapas06_E1(EntreEtapas):
+    def __init__(self, input_manager: entrada.InputManager):
+        proximo_estado = "FASE06_E1"
+        forma = Losango(400*config.UN, 60, config.Cores.BRANCO, 0)
+        forma.posicao = Vector2(config.LARGURA // 2, config.ALTURA // 2)
+        forma.rotacao = 180
+        super().__init__(input_manager, forma, proximo_estado)
+
+class Fase06_E1(Fase06):
+    def __init__(self, input_manager: entrada.InputManager):
+        qtd_iniciais = {
+            TipoForma.LOSANGO: 2,
+            TipoForma.PARALELOGRAMO: 2,
+            TipoForma.QUADRADO: 2,
+            TipoForma.RETANGULO: 2
+        }
+
+        alvo = [TipoForma.LOSANGO]
+
+        super().__init__(input_manager, qtd_iniciais, alvo, "ENTREETAPAS06_E2", "ENTREETAPAS06_E1")
+
+class EntreEtapas06_E2(EntreEtapas):
+    def __init__(self, input_manager: entrada.InputManager):
+        proximo_estado = "FASE06_E2"
+        forma = Quadrado(400*config.UN, config.Cores.BRANCO, 0)
+        forma.posicao = Vector2(config.LARGURA // 2, config.ALTURA // 2)
+        super().__init__(input_manager, forma, proximo_estado)
+
+class Fase06_E2(Fase06):
+    def __init__(self, input_manager: entrada.InputManager):
+        qtd_iniciais = {
+            TipoForma.LOSANGO: 2,
+            TipoForma.PARALELOGRAMO: 2,
+            TipoForma.QUADRADO: 2,
+            TipoForma.RETANGULO: 2
+        }
+
+        alvo = [TipoForma.QUADRADO]
+
+        super().__init__(input_manager, qtd_iniciais, alvo, "FASES", "ENTREETAPAS06_E2")
+
+
+# ======================================================= FASE 7 ========================================================
+
 
 class Fase07(FaseBase):
     def __init__(self, input_manager: entrada.InputManager):
@@ -504,3 +621,10 @@ class Fase07(FaseBase):
         return self.restart_state
     def desenhar(self, tela):
         pass
+
+# 2 angulos reto obtuso e agudo
+# 3 soma dos vertices
+# 4 formas não simetricas / Simetria Rotacional e reflexiva
+# 5 formas convexas  
+# 6 paralelogramo, losango, trapézio, quadrado
+# 

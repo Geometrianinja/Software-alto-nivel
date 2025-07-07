@@ -2,8 +2,23 @@ from abc import ABC, abstractmethod
 import pygame as pg
 from pygame.math import Vector2
 from typing import Sequence, Optional
-from math import pi, cos, sin, radians, tan
+from math import pi, cos, sin, radians, tan, atan2
 from enum import Enum
+
+def angulo_anti_horario(v1: Vector2, v2: Vector2) -> float:
+    """
+    Calcula o ângulo entre dois vetores no sentido anti-horário.
+    
+    Args:
+        v1: Primeiro vetor
+        v2: Segundo vetor
+    
+    Returns:
+        Ângulo em graus (0 a 360) no sentido anti-horário de v1 para v2
+    """
+    cross = v1.cross(v2)
+    dot = v1.dot(v2)
+    return atan2(cross, dot) * (180 / pi) % 360
 
 
 def reta_corta_segmento(p1: Vector2, p2: Vector2, p0: Vector2, v0: Vector2) -> Optional[tuple[Vector2, float, float]]:
@@ -48,6 +63,9 @@ class TipoForma(Enum):
     TRIANGULO_RETANGULO = 7
     ESTRELA = 8
     ANGULO = 9
+    PARALELOGRAMO = 10
+    LOSANGO = 11
+    TRAPEZIO = 12
 
 class Forma(ABC):
     def __init__(self, cor, gravidade: float = 50):
@@ -57,7 +75,7 @@ class Forma(ABC):
         self.velocidade: Vector2 = Vector2(0, 0)
         self.rotacao: float = 0.0
         self.velocidade_rotacao: float = 0.0
-        self.tipo: TipoForma = TipoForma.FORMA
+        self.tipos: list[TipoForma] = [TipoForma.FORMA]
 
     @abstractmethod
     def colide_com_ponto(self, ponto: Vector2 | Sequence[float]) -> bool:
@@ -125,6 +143,13 @@ class Forma(ABC):
         """
         self.velocidade_rotacao = velocidade
         return self
+    
+    def is_tipo(self, tipo: TipoForma) -> bool:
+        """Verifica se a forma é do tipo especificado."""
+        return tipo in self.tipos
+
+    def get_tipo_especifico(self):
+        return self.tipos[-1]
 
 def _baricentro(vertices: Sequence[Vector2]) -> Vector2:
     """Calcula o baricentro (centroide) de área de um polígono usando a fórmula da área com coordenadas."""
@@ -163,24 +188,28 @@ def _sequence_to_vector2(seq: Sequence[float] | Vector2) -> Vector2:
     return Vector2(seq[0], seq[1])
 
 class Poligono(Forma):
-    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50, iguais:list[list[int]]=[]):
+    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50, iguais:list[list[int]]=[], angulos_iguais:list[list[int]]=[], angulos_retos:list[int]=[]):
         """
             iguais: lista de listas de indices de lados iguais
+            vertices: lista de vetores representando os vértices do polígono no sentido horario
         """
         super().__init__(cor, gravidade)
-        self.tipo = TipoForma.POLIGONO
+        self.tipos.append(TipoForma.POLIGONO)
         baricentro = _baricentro(vertices)
         self.vertices = [v - baricentro for v in vertices]
 
         downscale_factor = 2
         self.lado = max(max(abs(v.x), abs(v.y)) for v in self.vertices) * 2 * downscale_factor + 4
+        tamanho_marca = self.lado*0.06
+        self.lado += int(tamanho_marca * 2)  # Garante que a superfície seja grande o suficiente para as marcas
         self.surface = pg.Surface((self.lado, self.lado), pg.SRCALPHA)
         points_in_texture = [v*downscale_factor + Vector2(self.lado/2, self.lado/2) for v in self.vertices]
         pg.draw.polygon(self.surface, cor, points_in_texture)
         pg.draw.lines(self.surface, (0, 0, 0), True, points_in_texture, width=3)
 
-        tamanho_marca = self.lado*0.08
         Poligono.put_ticks_on_surface(self.surface, points_in_texture, iguais, tamanho_marca, tamanho_marca/2)
+        Poligono.put_right_angles_on_surface(self.surface, points_in_texture, angulos_retos, tamanho_marca*1.5)
+        Poligono.put_equal_angles_on_surface(self.surface, points_in_texture, angulos_iguais, tamanho_marca*1.5)
 
         self.surface=pg.transform.smoothscale_by(self.surface, 1/downscale_factor)
         self.sombra = pg.Surface((self.lado, self.lado), pg.SRCALPHA)
@@ -201,6 +230,37 @@ class Poligono(Forma):
                 for d in ds:
                     pg.draw.line(surface, (0, 0, 0), middle+u*d+up, middle+u*d+down, width=4)
 
+    @classmethod
+    def put_equal_angles_on_surface(cls, surface, points: list[Vector2], angulos_iguais: list[list[int]], radius, separation_angle = 15):
+        for idx, vertices_idxs in enumerate(angulos_iguais):
+            angs_ticks = [-idx*separation_angle/2 + n*separation_angle for n in range(idx+1)]
+            for vertice_id in vertices_idxs:
+                v1 = points[vertice_id-1]
+                v2 = points[(vertice_id)]
+                v3 = points[(vertice_id+1) % len(points)]
+                angulo = angulo_anti_horario(v1 - v2, v3-v2)
+                angs = [i/20 * angulo for i in range(20+1)]
+                w0 = (v1-v2).normalize() * radius
+                ws = [w0.rotate(ang) for ang in angs]
+                pg.draw.lines(surface, (0, 0, 0), False, [v2 + w for w in ws], width=4)
+                for ang in angs_ticks:
+                    w1 = w0.rotate(angulo/2+ang)
+                    pg.draw.line(surface, (0, 0, 0), v2 + w1*0.6, v2 + w1 * 1.4, width=4)
+
+
+    @classmethod
+    def put_right_angles_on_surface(cls, surface, points: list[Vector2], angulos_retos: list[int], length):
+        for idx, vertice_id in enumerate(angulos_retos):
+            v1 = points[vertice_id-1]
+            v2 = points[vertice_id]
+            v3 = points[(vertice_id+1) % len(points)]
+            u1 = (v1 - v2).normalize()
+            u2 = (v3 - v2).normalize()
+            w1 = u1* length
+            w2 = u2 * length
+            pg.draw.lines(surface, (0, 0, 0), False, [v2+w1, v2+w1+w2, v2+w2], width=4)
+            pg.draw.circle(surface, (0, 0, 0), v2 + w1/2 + w2/2, 3)
+            
 
     def colide_com_ponto(self, ponto: Vector2 | Sequence[float]) -> bool:
         ponto = _sequence_to_vector2(ponto)  # Garante que ponto é um Vector2
@@ -374,12 +434,7 @@ class Circulo(Poligono):
             vertices.append(Vector2(x, y))
         self.vertices = vertices
         super().__init__(vertices, cor, gravidade)
-        self.tipo = TipoForma.CIRCULO
-
-class Triangulo(Poligono):
-    def __init__(self, p1: Vector2, p2: Vector2, p3: Vector2, cor: tuple[int, int, int], gravidade: float = 50, **kwargs):
-        super().__init__([p1, p2, p3], cor, gravidade, **kwargs)
-        self.tipo = TipoForma.TRIANGULO
+        self.tipos.append(TipoForma.CIRCULO)
 
 class Retangulo(Poligono):
     def __init__(self, largura: float, altura: float, cor: tuple[int, int, int], gravidade: float = 50, **kwargs):
@@ -387,15 +442,43 @@ class Retangulo(Poligono):
         p2 = Vector2(largura, 0)
         p3 = Vector2(largura, altura)
         p4 = Vector2(0, altura)
-        super().__init__([p1, p2, p3, p4], cor, gravidade, **kwargs)
-        self.tipo = TipoForma.RETANGULO
+        
+        # Set default values, but allow kwargs to override them
+        default_kwargs = {
+            'iguais': [[0, 2], [1, 3]], 
+            'angulos_retos': [0, 1, 2, 3]
+        }
+        default_kwargs.update(kwargs)
+        
+        super().__init__([p1, p2, p3, p4], cor, gravidade, **default_kwargs)
+        self.tipos.append(TipoForma.RETANGULO)
         self.largura = largura
         self.altura = altura
 
 class Quadrado(Retangulo):
     def __init__(self, lado: float, cor: tuple[int, int, int], gravidade: float = 50, **kwargs):
-        super().__init__(lado, lado, cor, gravidade, **kwargs)
-        self.tipo = TipoForma.QUADRADO
+        super().__init__(lado, lado, cor, gravidade, iguais=[[0, 1, 2, 3]], **kwargs)
+        self.tipos.append(TipoForma.LOSANGO)
+        self.tipos.append(TipoForma.QUADRADO)
+
+class Paralelogramo(Poligono):
+    def __init__(self, lado1: float, lado2: float, angulo: float, cor: tuple[int, int, int], gravidade: float = 50):
+        pontos = _get_points_from_lengths_and_angles([lado1, lado2, lado1], [angulo, 180 - angulo, angulo])
+        super().__init__(pontos, cor, gravidade, iguais=[[0, 2], [1, 3]], angulos_iguais=[[0, 2], [1, 3]])
+        self.tipos.append(TipoForma.PARALELOGRAMO)
+
+class Losango(Poligono):
+    def __init__(self, lado: float, angulo: float, cor: tuple[int, int, int], gravidade: float = 50):
+        pontos = _get_points_from_lengths_and_angles([lado, lado, lado], [angulo, 180 - angulo, angulo])
+        super().__init__(pontos, cor, gravidade, iguais=[[0, 1, 2, 3]], angulos_iguais=[[0, 1], [2, 3]])
+        self.tipos.append(TipoForma.PARALELOGRAMO)
+        self.tipos.append(TipoForma.LOSANGO)
+
+
+class Triangulo(Poligono):
+    def __init__(self, p1: Vector2, p2: Vector2, p3: Vector2, cor: tuple[int, int, int], gravidade: float = 50, **kwargs):
+        super().__init__([p1, p2, p3], cor, gravidade, **kwargs)
+        self.tipos.append(TipoForma.TRIANGULO)
 
 class TrianguloEquilatero(Triangulo):
     def __init__(self, lado: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -403,8 +486,8 @@ class TrianguloEquilatero(Triangulo):
         p1 = Vector2(0, -altura / 3)
         p2 = Vector2(-lado / 2, altura * 2 / 3)
         p3 = Vector2(lado / 2, altura * 2 / 3)
-        super().__init__(p1, p2, p3, cor, gravidade, iguais=[[0, 1, 2]])
-        self.tipo = TipoForma.TRIANGULO_EQUILATERO
+        super().__init__(p1, p2, p3, cor, gravidade, iguais=[[0, 1, 2]], angulos_iguais=[[0, 1, 2]])
+        self.tipos.append(TipoForma.TRIANGULO_EQUILATERO)
 
 class TrianguloIsoceles(Triangulo):
     def __init__(self, lado: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -413,15 +496,15 @@ class TrianguloIsoceles(Triangulo):
         p2 = Vector2(-base / 2, 0)
         p3 = Vector2(base / 2, 0)
         super().__init__(p1, p2, p3, cor, gravidade, iguais=[[0, 2]])
-        self.tipo = TipoForma.TRIANGULO_ISOCELES
+        self.tipos.append(TipoForma.TRIANGULO_ISOCELES)
 
 class TrianguloRetangulo(Triangulo):
     def __init__(self, altura: float, base: float, cor: tuple[int, int, int], gravidade: float = 50):
         p1 = Vector2(0, altura)
         p2 = Vector2(0, 0)
         p3 = Vector2(base, 0)
-        super().__init__(p1, p2, p3, cor, gravidade)
-        self.tipo = TipoForma.TRIANGULO_RETANGULO
+        super().__init__(p1, p2, p3, cor, gravidade, angulos_retos=[1])
+        self.tipos.append(TipoForma.TRIANGULO_RETANGULO)
 
 
 class Estrela(Poligono):
@@ -436,7 +519,7 @@ class Estrela(Poligono):
             pontos.append(Vector2(x, y))
             pontos.append(Vector2(x2, y2))
         super().__init__(pontos, cor, gravidade)
-        self.tipo = TipoForma.ESTRELA
+        self.tipos.append(TipoForma.ESTRELA)
 
 class Angulo(Poligono):
     def __init__(self, tamanho: float, espessura: float, angulo: float, cor: tuple[int, int, int], gravidade: float = 50):
@@ -446,6 +529,6 @@ class Angulo(Poligono):
             [180-angulo, -90, -90, -180+angulo, -90]
         )
         super().__init__(pontos, cor, gravidade)
-        self.tipo = TipoForma.ANGULO
+        self.tipos.append(TipoForma.ANGULO)
         self.tamanho = tamanho
         self.angulo = angulo

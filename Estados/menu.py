@@ -119,7 +119,7 @@ class Fases(MenuBase):
             ["Fase 3", "FASE03"],
             ["Fase 4", "FASE04"],
             ["Fase 5", "FASE05"],
-            ["Fase 6", "FASE06"],
+            ["Fase 6", "ENTREETAPAS06_E0"],
             ["Fase 7", "FASE07"],
         ]
         botoes_posicoes = [

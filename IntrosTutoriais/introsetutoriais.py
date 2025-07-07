@@ -154,7 +154,7 @@ class Tutorial0_(SlideShowBase):
 
         formas = [[] for _ in range(2)]
  
-        super().__init__("TUTORIAL0_", imagens, "FASE00", "TUTORIAL0",input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("TUTORIAL0_", imagens, "FASE00_E0", "TUTORIAL0",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class PosFase00(SlideShowBase):
     def __init__(self, input_manager):
@@ -202,7 +202,7 @@ class Tutorial1(SlideShowBase):
         formas[2] = [triIso]
         formas[3] = [triEsca]
  
-        super().__init__("TUTORIAL1", imagens, "FASE01", "INTRO1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
+        super().__init__("TUTORIAL1", imagens, "FASE01_E0", "INTRO1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
 class PosFase01(SlideShowBase):
     def __init__(self, input_manager):
@@ -213,3 +213,7 @@ class PosFase01(SlideShowBase):
         largura_max = 430*config.LARGURA //1000
         formas = [[] for _ in range(7)]
         super().__init__("POSFASE01", imagens, "FASES", "TUTORIAL1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
+
+
+
+
