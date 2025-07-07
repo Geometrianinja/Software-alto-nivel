@@ -12,8 +12,15 @@ class InputManager(Calibrattion):
         self.cont_back_just_pressed = False
         self.cont_select_pressed = False
         self.cont_select_just_pressed = False
+
+        self.button_select_and_pressed = False
+
         self.cont_gyro = None
         self.cont_screen_pos = None
+        self.cont_cut_start_pos = None
+
+
+        self.controller_screen_pos_diff = [0, 0]
 
         self.quit_just_pressed = False
         self.mouse_left_pressed = False
@@ -89,6 +96,11 @@ class InputManager(Calibrattion):
                     self.cont_select_pressed = True
                     self.cont_select_just_pressed = True
                     self.button_select_and_pressed = True
+                    self.cont_cut_start_pos = self.cont_screen_pos  # Salva a posição inicial do corte
+                elif event.button == ButtonID.BUTTON_SELECT and event.event_type == ButtonEventType.RELEASED:
+                    self.cont_select_pressed = False
+                    self.button_select_and_pressed = False
+                    self.cont_cut_start_pos = None  # Apenas reseta, não calcula diff aqui!
                 else: 
                     self.button_select_and_pressed = False
 
@@ -97,5 +109,18 @@ class InputManager(Calibrattion):
                 break
         
         if self.calibrated:
+            prev_cont_screen_pos = self.cont_screen_pos if self.cont_screen_pos is not None else None
+
             self.cont_screen_pos = self.get_point(self.gyro)
-    
+
+            if (
+                prev_cont_screen_pos is not None
+                and self.cont_screen_pos is not None
+                and self.button_select_and_pressed  # Só atualiza se estiver pressionado
+            ):
+                self.controller_screen_pos_diff = [
+                    self.cont_screen_pos[0] - prev_cont_screen_pos[0],
+                    self.cont_screen_pos[1] - prev_cont_screen_pos[1]
+                ]
+            else:
+                self.controller_screen_pos_diff = [0, 0]

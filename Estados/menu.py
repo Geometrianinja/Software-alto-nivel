@@ -61,10 +61,8 @@ class MenuBase():
             String: Se o jogador deseja mudar de estado, ele retorna o futuro estado, caso contrário, ele retorna o próprio estado
         """
         
-        
-        
         for (nome, estado) in self.opcoes:
-            if self.input_manager.mouse_left_just_pressed and self.rect[nome].collidepoint(self.input_manager.mouse_pos):
+            if (self.input_manager.mouse_left_just_pressed and self.rect[nome].collidepoint(self.input_manager.mouse_pos)) or (self.input_manager.cont_select_just_pressed and self.rect[nome].collidepoint(self.input_manager.cont_screen_pos)):
                 return estado
         
         return self.estado_name
