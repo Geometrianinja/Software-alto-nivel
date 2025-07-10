@@ -294,6 +294,7 @@ class FaseBase(ABC):
         Atualiza o estado das formas na tela, processando interações do jogador e removendo formas antigas.
         """
         mouse_vel_vector = Vector2(self.input_manager.mouse_diff)/self.input_manager.dt
+        cont_vel_vector = Vector2(self.input_manager.controller_screen_pos_diff)/self.input_manager.dt
         for idx in range(len(self.formas)-1, -1, -1):
             forma = self.formas[idx]
             if self.input_manager.mouse_left_pressed and forma.colide_com_segmento(self.input_manager.mouse_pos, self.input_manager.mouse_diff):
@@ -301,6 +302,15 @@ class FaseBase(ABC):
 
                 cortes = forma.cortar(self.input_manager.mouse_pos,  mouse_vel_vector)
                 self.formas_cortadas.extend(cortes)  # Adiciona as formas cortadas à lista de cortadas
+                self.formas.pop(idx)  # Remove a forma cortada da lista
+
+                self.agendar_forma(forma.get_tipo_especifico(), self.delay_forma)
+
+            if self.input_manager.cont_select_pressed and forma.colide_com_segmento(self.input_manager.cont_screen_pos, self.input_manager.controller_screen_pos_diff):
+                self.contabilizar_corte(forma)
+
+                cortes = forma.cortar(self.input_manager.cont_screen_pos, mouse_vel_vector)
+                self.formas_cortadas.extend(cortes)
                 self.formas.pop(idx)  # Remove a forma cortada da lista
 
                 self.agendar_forma(forma.get_tipo_especifico(), self.delay_forma)

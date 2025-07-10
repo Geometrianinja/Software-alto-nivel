@@ -57,7 +57,7 @@ class Gerenciador:
             "FASE07" : fases.Fase07(self.input_manager),
             }
 
-        self.estado_atual = self.estados["FASES"]  # Estado inicial
+        self.estado_atual = self.estados["CONTROL"]  # Estado inicial
 
     def esta_em_fase(self):
         """Verifica se o estado atual é uma fase jogável.
