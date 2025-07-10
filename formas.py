@@ -4,6 +4,9 @@ from pygame.math import Vector2
 from typing import Sequence, Optional
 from math import pi, cos, sin, radians, tan, atan2
 from enum import Enum
+from typing import List
+from typing import Dict
+from typing import Tuple
 
 def angulo_anti_horario(v1: Vector2, v2: Vector2) -> float:
     """
@@ -21,12 +24,12 @@ def angulo_anti_horario(v1: Vector2, v2: Vector2) -> float:
     return atan2(cross, dot) * (180 / pi) % 360
 
 
-def reta_corta_segmento(p1: Vector2, p2: Vector2, p0: Vector2, v0: Vector2) -> Optional[tuple[Vector2, float, float]]:
+def reta_corta_segmento(p1: Vector2, p2: Vector2, p0: Vector2, v0: Vector2) -> Optional[Tuple[Vector2, float, float]]:
     """
     Verifica se um segmento (p1->p2) intersecta uma reta (p0 + t*v0).
     
     Returns:
-        tuple[Vector2, float, float] | None: (ponto_intersecao, t_segmento, t_reta) ou None
+        Tuple[Vector2, float, float] | None: (ponto_intersecao, t_segmento, t_reta) ou None
         - t_segmento: parâmetro do segmento [0,1]
         - t_reta: parâmetro da reta
     """
@@ -69,13 +72,13 @@ class TipoForma(Enum):
 
 class Forma(ABC):
     def __init__(self, cor, gravidade: float = 50):
-        self.cor: tuple[int, int, int] = cor
+        self.cor: Tuple[int, int, int] = cor
         self.gravidade: float = gravidade
         self.posicao: Vector2 = Vector2(0, 0)
         self.velocidade: Vector2 = Vector2(0, 0)
         self.rotacao: float = 0.0
         self.velocidade_rotacao: float = 0.0
-        self.tipos: list[TipoForma] = [TipoForma.FORMA]
+        self.tipos: List[TipoForma] = [TipoForma.FORMA]
 
     @abstractmethod
     def colide_com_ponto(self, ponto: Vector2 | Sequence[float]) -> bool:
@@ -101,7 +104,7 @@ class Forma(ABC):
         pass
 
     @abstractmethod
-    def cortar(self, ponto: Vector2 | Sequence[float | int], v: Vector2 | Sequence[float | int]) -> list['Forma']:
+    def cortar(self, ponto: Vector2 | Sequence[float | int], v: Vector2 | Sequence[float | int]) -> List['Forma']:
         """Particiona a forma em duas partes a partir de um ponto e um vetor.
         Este método deve ser implementado por subclasses que suportam partição.
         Args:
@@ -188,7 +191,7 @@ def _sequence_to_vector2(seq: Sequence[float] | Vector2) -> Vector2:
     return Vector2(seq[0], seq[1])
 
 class Poligono(Forma):
-    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50, iguais:list[list[int]]=[], angulos_iguais:list[list[int]]=[], angulos_retos:list[int]=[]):
+    def __init__(self, vertices: Sequence[Vector2], cor: tuple[int, int, int], gravidade: float = 50, iguais:List[List[int]]=[], angulos_iguais:List[List[int]]=[], angulos_retos:List[int]=[]):
         """
             iguais: lista de listas de indices de lados iguais
             vertices: lista de vetores representando os vértices do polígono no sentido horario
@@ -217,7 +220,7 @@ class Poligono(Forma):
         self.sombra = pg.transform.smoothscale_by(self.sombra, 1/downscale_factor)
 
     @classmethod
-    def put_ticks_on_surface(cls, surface, points: list[Vector2], iguais: list[list[int]], length, separation):
+    def put_ticks_on_surface(cls, surface, points: List[Vector2], iguais: List[List[int]], length, separation):
         for idx, vertices_idxs in enumerate(iguais):
             ds = [-idx*separation/2 + n*separation for n in range(idx+1)]
             for vertice_id in vertices_idxs:
@@ -231,7 +234,7 @@ class Poligono(Forma):
                     pg.draw.line(surface, (0, 0, 0), middle+u*d+up, middle+u*d+down, width=4)
 
     @classmethod
-    def put_equal_angles_on_surface(cls, surface, points: list[Vector2], angulos_iguais: list[list[int]], radius, separation_angle = 15):
+    def put_equal_angles_on_surface(cls, surface, points: List[Vector2], angulos_iguais: List[List[int]], radius, separation_angle = 15):
         for idx, vertices_idxs in enumerate(angulos_iguais):
             angs_ticks = [-idx*separation_angle/2 + n*separation_angle for n in range(idx+1)]
             for vertice_id in vertices_idxs:
@@ -249,7 +252,7 @@ class Poligono(Forma):
 
 
     @classmethod
-    def put_right_angles_on_surface(cls, surface, points: list[Vector2], angulos_retos: list[int], length):
+    def put_right_angles_on_surface(cls, surface, points: List[Vector2], angulos_retos: List[int], length):
         for idx, vertice_id in enumerate(angulos_retos):
             v1 = points[vertice_id-1]
             v2 = points[vertice_id]
@@ -305,7 +308,7 @@ class Poligono(Forma):
     def local_to_global(self, ponto: Vector2, deslocamento: Vector2 = Vector2(0, 0)) -> Vector2:
         return ponto.rotate(self.rotacao) + self.posicao + deslocamento
 
-    def cortar(self, ponto: Vector2 | Sequence[float | int], v: Vector2 | Sequence[float | int], vel_separacao:float=60) -> list['Poligono']:
+    def cortar(self, ponto: Vector2 | Sequence[float | int], v: Vector2 | Sequence[float | int], vel_separacao:float=60) -> List['Poligono']:
         """
         Corta o polígono usando uma linha definida por um ponto e um vetor.
 
@@ -408,7 +411,7 @@ class Poligono(Forma):
         self.desenhar(tela)
 
     
-def _get_points_from_lengths_and_angles(lengths: Sequence[float], angles: Sequence[float]) -> list[Vector2]:
+def _get_points_from_lengths_and_angles(lengths: Sequence[float], angles: Sequence[float]) -> List[Vector2]:
     """Calcula os pontos de um polígono a partir de comprimentos e ângulos.
     O desenho começa na origem (0, 0) e os ângulos são relativos ao lado anterior.
     O primeiro ângulo é relativo ao eixo x positivo.

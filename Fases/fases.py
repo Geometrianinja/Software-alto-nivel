@@ -306,10 +306,10 @@ class FaseBase(ABC):
 
                 self.agendar_forma(forma.get_tipo_especifico(), self.delay_forma)
 
-            if self.input_manager.cont_select_pressed and forma.colide_com_segmento(self.input_manager.cont_screen_pos, self.input_manager.controller_screen_pos_diff):
+            if self.input_manager.cont_select_pressed and (forma.colide_com_segmento(self.input_manager.cont_screen_pos, self.input_manager.controller_screen_pos_diff) or forma.colide_com_ponto(self.input_manager.cont_screen_pos)):
                 self.contabilizar_corte(forma)
 
-                cortes = forma.cortar(self.input_manager.cont_screen_pos, mouse_vel_vector)
+                cortes = forma.cortar(self.input_manager.cont_screen_pos, self.input_manager.controller_screen_pos_diff)
                 self.formas_cortadas.extend(cortes)
                 self.formas.pop(idx)  # Remove a forma cortada da lista
 
@@ -484,14 +484,6 @@ class Fase01_E0(Fase01):
         alvo = [TipoForma.TRIANGULO_EQUILATERO]
 
         super().__init__(input_manager, qtd_iniciais, alvo, "ENTREETAPAS01_E0", "TUTORIAL1")
-        
-class EntreEtapas01_E0(EntreEtapas):
-    def __init__(self, input_manager):
-        proximo_estado = "FASE01_E1"
-        forma = TrianguloIsoceles(400*config.UN, 250*config.UN, config.Cores.BRANCO, 0)
-        forma.posicao = Vector2(config.LARGURA // 2, config.ALTURA // 2)
-        forma.rotacao = 180
-        super().__init__(input_manager, forma, proximo_estado)
 
 class Fase01_E1(Fase01):
     def __init__(self, input_manager: entrada.InputManager):

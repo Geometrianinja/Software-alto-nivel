@@ -204,6 +204,21 @@ class Tutorial1(SlideShowBase):
  
         super().__init__("TUTORIAL1", imagens, "FASE01_E0", "INTRO1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
 
+
+class EntreEtapas01_E0(SlideShowBase):
+    def __init__(self, input_manager):
+        slides = 1
+        imagens = [
+            "images/FASE1tutorial.png" for _ in range(slides)
+        ]
+        legendas = "IntrosTutoriais/Tutoriais/Tutorial_1_E1.txt"
+        pos_x = 200*config.LARGURA //1000
+        pos_y = 90*config.ALTURA //1000
+        largura_max = 650*config.LARGURA //1000
+        formas = [[] for _ in range(slides)]
+        super().__init__("ENTREETAPAS01_E0", imagens, "FASE01_E1", "TUTORIAL1",input_manager, legendas, pos_x, pos_y, largura_max, formas)
+
+
 class PosFase01(SlideShowBase):
     def __init__(self, input_manager):
         imagens = ["images/pos1FASE1jogo.png"] + ["images/pos2FASE1.png" for _ in range(5)]+["images/pos3FASE1.png"] 

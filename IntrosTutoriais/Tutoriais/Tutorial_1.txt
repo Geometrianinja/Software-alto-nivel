@@ -6,6 +6,6 @@ Isósceles:Tem dois lados e dois ângulos de mesma medidade e um diferente!
 
 Escaleno: Todos os lados e ângulos são diferentes.
 
-Corte 10 triângulos equiláteros!
+Corte 5 triângulos equiláteros!
 E desvie dos triângulos isósceles e escalenos
 

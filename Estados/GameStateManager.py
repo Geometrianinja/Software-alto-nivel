@@ -38,7 +38,7 @@ class Gerenciador:
             "INTRO1": introsetutoriais.Intro1(input_manager),
             "TUTORIAL1": introsetutoriais.Tutorial1(input_manager),
             "FASE01_E0" : fases.Fase01_E0(self.input_manager),
-            "ENTREETAPAS01_E0": fases.EntreEtapas01_E0(self.input_manager),
+            "ENTREETAPAS01_E0": introsetutoriais.EntreEtapas01_E0(self.input_manager),
             "FASE01_E1" : fases.Fase01_E1(self.input_manager),
             "POSFASE01": introsetutoriais.PosFase01(self.input_manager),
             
